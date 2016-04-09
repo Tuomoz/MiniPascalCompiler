@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace MiniPascalCompiler
 {
-    class Scanner
+    public class Scanner
     {
         private SourceReader Source;
         private ErrorHandler ErrorHandler;
@@ -47,7 +47,6 @@ namespace MiniPascalCompiler
             KeywordTokens.Add("program", TokenType.KwProgram);
             KeywordTokens.Add("procedure", TokenType.KwProcedure);
             KeywordTokens.Add("function", TokenType.KwFunction);
-            KeywordTokens.Add("assert", TokenType.KwAssert);
             KeywordTokens.Add("array", TokenType.KwArray);
             KeywordTokens.Add("of", TokenType.KwOf);
             KeywordTokens.Add("begin", TokenType.KwBegin);
