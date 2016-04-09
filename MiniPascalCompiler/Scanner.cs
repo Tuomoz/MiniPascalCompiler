@@ -20,29 +20,43 @@ namespace MiniPascalCompiler
             ErrorHandler = errorHandler;
             SymbolTokens.Add("(", TokenType.LParen);
             SymbolTokens.Add(")", TokenType.RParen);
-            SymbolTokens.Add("+", TokenType.OpPlus);
-            SymbolTokens.Add("-", TokenType.OpMinus);
+            SymbolTokens.Add("[", TokenType.LBracket);
+            SymbolTokens.Add("]", TokenType.RBracket);
+            SymbolTokens.Add("+", TokenType.Plus);
+            SymbolTokens.Add("-", TokenType.Minus);
             SymbolTokens.Add("/", TokenType.OpDivide);
             SymbolTokens.Add("*", TokenType.OpMultiply);
+            SymbolTokens.Add("%", TokenType.OpModulus);
             SymbolTokens.Add("<", TokenType.OpLess);
+            SymbolTokens.Add(">", TokenType.OpMore);
+            SymbolTokens.Add("<=", TokenType.OpLessOrEquals);
+            SymbolTokens.Add(">=", TokenType.OpMoreOrEquals);
+            SymbolTokens.Add("<>", TokenType.OpNotEquals);
             SymbolTokens.Add("=", TokenType.OpEquals);
-            SymbolTokens.Add("&", TokenType.OpAnd);
-            SymbolTokens.Add("!", TokenType.OpNot);
+            SymbolTokens.Add(".", TokenType.OpDot);
             SymbolTokens.Add(";", TokenType.LineTerm);
             SymbolTokens.Add(":", TokenType.Colon);
             SymbolTokens.Add(":=", TokenType.OpAssignment);
-            SymbolTokens.Add("..", TokenType.OpRange);
+            SymbolTokens.Add(",", TokenType.Comma);
             KeywordTokens.Add("var", TokenType.KwVar);
-            KeywordTokens.Add("int", TokenType.KwInt);
-            KeywordTokens.Add("string", TokenType.KwString);
-            KeywordTokens.Add("bool", TokenType.KwBool);
-            KeywordTokens.Add("for", TokenType.KwFor);
+            KeywordTokens.Add("while", TokenType.KwWhile);
             KeywordTokens.Add("end", TokenType.KwEnd);
             KeywordTokens.Add("in", TokenType.KwIn);
             KeywordTokens.Add("do", TokenType.KwDo);
-            KeywordTokens.Add("read", TokenType.KwRead);
-            KeywordTokens.Add("print", TokenType.KwPrint);
             KeywordTokens.Add("assert", TokenType.KwAssert);
+            KeywordTokens.Add("program", TokenType.KwProgram);
+            KeywordTokens.Add("procedure", TokenType.KwProcedure);
+            KeywordTokens.Add("function", TokenType.KwFunction);
+            KeywordTokens.Add("assert", TokenType.KwAssert);
+            KeywordTokens.Add("array", TokenType.KwArray);
+            KeywordTokens.Add("of", TokenType.KwOf);
+            KeywordTokens.Add("begin", TokenType.KwBegin);
+            KeywordTokens.Add("return", TokenType.KwReturn);
+            KeywordTokens.Add("then", TokenType.KwThen);
+            KeywordTokens.Add("else", TokenType.KwElse);
+            KeywordTokens.Add("not", TokenType.OpNot);
+            KeywordTokens.Add("or", TokenType.OpOr);
+            KeywordTokens.Add("and", TokenType.OpAnd);
             EscapeCharacters.Add('"', '"');
             EscapeCharacters.Add('\'', '\'');
             EscapeCharacters.Add('n', '\n');
@@ -311,9 +325,13 @@ namespace MiniPascalCompiler
 
     public enum TokenType
     {
-        Identifier, IntLiteral, LParen, RParen, OpPlus, OpMinus, KwVar, KwInt,
-        KwString, OpAssignment, OpRange, StringLiteral, KwFor, KwEnd, KwIn, KwDo, KwRead, KwPrint,
-        KwBool, KwAssert, OpMultiply, OpDivide, OpLess, OpEquals, OpAnd, OpNot, LineTerm, Colon, EOF
+        Identifier, IntLiteral, LParen, RParen, Plus, Minus, KwVar,
+        OpAssignment, OpRange, StringLiteral, KwWhile, KwEnd, KwIn, KwDo,
+        KwAssert, OpMultiply, OpDivide, OpLess, OpEquals, OpAnd, OpNot,
+        LineTerm, Colon, EOF, KwProgram, KwProcedure, KwFunction, KwArray,
+        KwOf, KwBegin, KwReturn, KwThen, KwElse, OpOr, Comma, LBracket,
+        RBracket, OpModulus, OpDot, OpMore, OpLessOrEquals, OpMoreOrEquals,
+        OpNotEquals, RealLiteral
     };
 
     public class Token
