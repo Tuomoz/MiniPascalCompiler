@@ -41,7 +41,6 @@ namespace MiniPascalCompiler
             KeywordTokens.Add("var", TokenType.KwVar);
             KeywordTokens.Add("while", TokenType.KwWhile);
             KeywordTokens.Add("end", TokenType.KwEnd);
-            KeywordTokens.Add("in", TokenType.KwIn);
             KeywordTokens.Add("do", TokenType.KwDo);
             KeywordTokens.Add("assert", TokenType.KwAssert);
             KeywordTokens.Add("program", TokenType.KwProgram);
@@ -325,12 +324,12 @@ namespace MiniPascalCompiler
     public enum TokenType
     {
         Identifier, IntLiteral, LParen, RParen, Plus, Minus, KwVar,
-        OpAssignment, OpRange, StringLiteral, KwWhile, KwEnd, KwIn, KwDo,
+        OpAssignment, StringLiteral, KwWhile, KwEnd, KwDo, RealLiteral,
         KwAssert, OpMultiply, OpDivide, OpLess, OpEquals, OpAnd, OpNot,
         LineTerm, Colon, EOF, KwProgram, KwProcedure, KwFunction, KwArray,
         KwOf, KwBegin, KwReturn, KwThen, KwElse, OpOr, Comma, LBracket,
         RBracket, OpModulus, OpDot, OpMore, OpLessOrEquals, OpMoreOrEquals,
-        OpNotEquals, RealLiteral
+        OpNotEquals, 
     };
 
     public class Token
