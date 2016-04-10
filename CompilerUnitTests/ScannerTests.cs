@@ -20,6 +20,82 @@ namespace CompilerUnitTests
             return new Scanner(reader, Errors);
         }
 
+        /*
+        Basic tests for all token types
+        */
+
+        [Test]
+        public void TestProgramToken()
+        {
+            Scanner lexer = CreateStringLexer("program");
+            Token token = lexer.GetNextToken();
+            Assert.That(token.Type, Is.EqualTo(TokenType.KwProgram));
+        }
+
+        [Test]
+        public void TestProcedureToken()
+        {
+            Scanner lexer = CreateStringLexer("procedure");
+            Token token = lexer.GetNextToken();
+            Assert.That(token.Type, Is.EqualTo(TokenType.KwProcedure));
+        }
+
+        [Test]
+        public void TestFunctionToken()
+        {
+            Scanner lexer = CreateStringLexer("function");
+            Token token = lexer.GetNextToken();
+            Assert.That(token.Type, Is.EqualTo(TokenType.KwFunction));
+        }
+
+        [Test]
+        public void TestArrayToken()
+        {
+            Scanner lexer = CreateStringLexer("array");
+            Token token = lexer.GetNextToken();
+            Assert.That(token.Type, Is.EqualTo(TokenType.KwArray));
+        }
+
+        [Test]
+        public void TestBeginToken()
+        {
+            Scanner lexer = CreateStringLexer("begin");
+            Token token = lexer.GetNextToken();
+            Assert.That(token.Type, Is.EqualTo(TokenType.KwBegin));
+        }
+
+        [Test]
+        public void TestElseToken()
+        {
+            Scanner lexer = CreateStringLexer("else");
+            Token token = lexer.GetNextToken();
+            Assert.That(token.Type, Is.EqualTo(TokenType.KwElse));
+        }
+
+        [Test]
+        public void TestOfToken()
+        {
+            Scanner lexer = CreateStringLexer("of");
+            Token token = lexer.GetNextToken();
+            Assert.That(token.Type, Is.EqualTo(TokenType.KwOf));
+        }
+
+        [Test]
+        public void TestReturnToken()
+        {
+            Scanner lexer = CreateStringLexer("return");
+            Token token = lexer.GetNextToken();
+            Assert.That(token.Type, Is.EqualTo(TokenType.KwReturn));
+        }
+
+        [Test]
+        public void TestThenToken()
+        {
+            Scanner lexer = CreateStringLexer("then");
+            Token token = lexer.GetNextToken();
+            Assert.That(token.Type, Is.EqualTo(TokenType.KwThen));
+        }
+
         [Test]
         public void TestVarKwToken()
         {
@@ -86,12 +162,19 @@ namespace CompilerUnitTests
         }
 
         [Test]
-        public void TestNumberToken()
+        public void TestLBracketToken()
         {
-            Scanner lexer = CreateStringLexer("123");
+            Scanner lexer = CreateStringLexer("[");
             Token token = lexer.GetNextToken();
-            Assert.That(token.Type, Is.EqualTo(TokenType.IntLiteral));
-            Assert.That(token.Content, Is.EqualTo("123"));
+            Assert.That(token.Type, Is.EqualTo(TokenType.LBracket));
+        }
+
+        [Test]
+        public void TestRBracketToken()
+        {
+            Scanner lexer = CreateStringLexer("]");
+            Token token = lexer.GetNextToken();
+            Assert.That(token.Type, Is.EqualTo(TokenType.RBracket));
         }
 
         [Test]
@@ -111,7 +194,23 @@ namespace CompilerUnitTests
         }
 
         [Test]
-        public void TestOpMinusToken()
+        public void TestCommaToken()
+        {
+            Scanner lexer = CreateStringLexer(",");
+            Token token = lexer.GetNextToken();
+            Assert.That(token.Type, Is.EqualTo(TokenType.Comma));
+        }
+
+        [Test]
+        public void TestDotToken()
+        {
+            Scanner lexer = CreateStringLexer(".");
+            Token token = lexer.GetNextToken();
+            Assert.That(token.Type, Is.EqualTo(TokenType.OpDot));
+        }
+
+        [Test]
+        public void TestMinusToken()
         {
             Scanner lexer = CreateStringLexer("-");
             Token token = lexer.GetNextToken();
@@ -119,7 +218,7 @@ namespace CompilerUnitTests
         }
 
         [Test]
-        public void TestOpPlusToken()
+        public void TestPlusToken()
         {
             Scanner lexer = CreateStringLexer("+");
             Token token = lexer.GetNextToken();
@@ -143,11 +242,51 @@ namespace CompilerUnitTests
         }
 
         [Test]
+        public void TestModToken()
+        {
+            Scanner lexer = CreateStringLexer("%");
+            Token token = lexer.GetNextToken();
+            Assert.That(token.Type, Is.EqualTo(TokenType.OpModulus));
+        }
+
+        [Test]
         public void TestOpLessToken()
         {
             Scanner lexer = CreateStringLexer("<");
             Token token = lexer.GetNextToken();
             Assert.That(token.Type, Is.EqualTo(TokenType.OpLess));
+        }
+
+        [Test]
+        public void TestMoreToken()
+        {
+            Scanner lexer = CreateStringLexer(">");
+            Token token = lexer.GetNextToken();
+            Assert.That(token.Type, Is.EqualTo(TokenType.OpMore));
+        }
+
+        [Test]
+        public void TestLessOrEqualsToken()
+        {
+            Scanner lexer = CreateStringLexer("<=");
+            Token token = lexer.GetNextToken();
+            Assert.That(token.Type, Is.EqualTo(TokenType.OpLessOrEquals));
+        }
+
+        [Test]
+        public void TestMoreOrEqualsToken()
+        {
+            Scanner lexer = CreateStringLexer(">=");
+            Token token = lexer.GetNextToken();
+            Assert.That(token.Type, Is.EqualTo(TokenType.OpMoreOrEquals));
+        }
+
+        [Test]
+        public void TestNotEqualsToken()
+        {
+            Scanner lexer = CreateStringLexer("<>");
+            Token token = lexer.GetNextToken();
+            Assert.That(token.Type, Is.EqualTo(TokenType.OpNotEquals));
         }
 
         [Test]
@@ -167,11 +306,64 @@ namespace CompilerUnitTests
         }
 
         [Test]
+        public void TestOrToken()
+        {
+            Scanner lexer = CreateStringLexer("or");
+            Token token = lexer.GetNextToken();
+            Assert.That(token.Type, Is.EqualTo(TokenType.OpOr));
+        }
+
+        [Test]
         public void TestTerminatorToken()
         {
             Scanner lexer = CreateStringLexer(";");
             Token token = lexer.GetNextToken();
             Assert.That(token.Type, Is.EqualTo(TokenType.LineTerm));
+        }
+
+        [Test]
+        public void TestIntLiteralToken()
+        {
+            Scanner lexer = CreateStringLexer("123");
+            Token token = lexer.GetNextToken();
+            Assert.That(token.Type, Is.EqualTo(TokenType.IntLiteral));
+            Assert.That(token.Content, Is.EqualTo("123"));
+        }
+
+        [Test]
+        public void TestRealLiteraTokenlWithoutExponent()
+        {
+            Scanner lexer = CreateStringLexer("1.23");
+            Token token = lexer.GetNextToken();
+            Assert.That(token.Type, Is.EqualTo(TokenType.RealLiteral));
+            Assert.That(token.Content, Is.EqualTo("1.23"));
+        }
+
+        [Test]
+        public void TestRealLiteralTokenWithExponentWithoutSign()
+        {
+            Scanner lexer = CreateStringLexer("1.2e3");
+            Token token = lexer.GetNextToken();
+            Assert.That(token.Type, Is.EqualTo(TokenType.RealLiteral));
+            Assert.That(token.Content, Is.EqualTo("1.2e3"));
+        }
+
+        [Test]
+        public void TestRealLiteralTokenWithExponentWithPlusSign()
+        {
+            Scanner lexer = CreateStringLexer("15.0e+3");
+            Token token = lexer.GetNextToken();
+            Assert.That(token.Type, Is.EqualTo(TokenType.RealLiteral));
+            Assert.That(token.Content, Is.EqualTo("15.0e+3"));
+        }
+
+        [Test]
+        public void TestRealLiteralTokenWithExponentWithMinusSign()
+        {
+            Scanner lexer = CreateStringLexer("0.59e-20");
+            Token token = lexer.GetNextToken();
+            Assert.That(token.Type, Is.EqualTo(TokenType.RealLiteral));
+            Assert.That(token.Content, Is.EqualTo("0.59e-20"));
         }
 
         [Test]
