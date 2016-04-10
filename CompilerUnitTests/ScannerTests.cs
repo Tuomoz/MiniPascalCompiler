@@ -25,7 +25,7 @@ namespace CompilerUnitTests
         {
             Scanner lexer = CreateStringLexer("var");
             Token token = lexer.GetNextToken();
-            Assert.AreEqual(TokenType.KwVar, token.Type);
+            Assert.That(token.Type, Is.EqualTo(TokenType.KwVar));
         }
 
         [Test]
@@ -33,7 +33,7 @@ namespace CompilerUnitTests
         {
             Scanner lexer = CreateStringLexer("while");
             Token token = lexer.GetNextToken();
-            Assert.AreEqual(TokenType.KwWhile, token.Type);
+            Assert.That(token.Type, Is.EqualTo(TokenType.KwWhile));
         }
 
         [Test]
@@ -41,7 +41,7 @@ namespace CompilerUnitTests
         {
             Scanner lexer = CreateStringLexer("end");
             Token token = lexer.GetNextToken();
-            Assert.AreEqual(TokenType.KwEnd, token.Type);
+            Assert.That(token.Type, Is.EqualTo(TokenType.KwEnd));
         }
 
         [Test]
@@ -49,7 +49,7 @@ namespace CompilerUnitTests
         {
             Scanner lexer = CreateStringLexer("do");
             Token token = lexer.GetNextToken();
-            Assert.AreEqual(TokenType.KwDo, token.Type);
+            Assert.That(token.Type, Is.EqualTo(TokenType.KwDo));
         }
 
         [Test]
@@ -57,7 +57,7 @@ namespace CompilerUnitTests
         {
             Scanner lexer = CreateStringLexer("assert");
             Token token = lexer.GetNextToken();
-            Assert.AreEqual(TokenType.KwAssert, token.Type);
+            Assert.That(token.Type, Is.EqualTo(TokenType.KwAssert));
         }
 
         [Test]
@@ -65,8 +65,8 @@ namespace CompilerUnitTests
         {
             Scanner lexer = CreateStringLexer("Some1_var");
             Token token = lexer.GetNextToken();
-            Assert.AreEqual(TokenType.Identifier, token.Type);
-            Assert.AreEqual("Some1_var", token.Content);
+            Assert.That(token.Type, Is.EqualTo(TokenType.Identifier));
+            Assert.That(token.Content, Is.EqualTo("Some1_var"));
         }
 
         [Test]
@@ -74,7 +74,7 @@ namespace CompilerUnitTests
         {
             Scanner lexer = CreateStringLexer("(");
             Token token = lexer.GetNextToken();
-            Assert.AreEqual(TokenType.LParen, token.Type);
+            Assert.That(token.Type, Is.EqualTo(TokenType.LParen));
         }
 
         [Test]
@@ -82,7 +82,7 @@ namespace CompilerUnitTests
         {
             Scanner lexer = CreateStringLexer(")");
             Token token = lexer.GetNextToken();
-            Assert.AreEqual(TokenType.RParen, token.Type);
+            Assert.That(token.Type, Is.EqualTo(TokenType.RParen));
         }
 
         [Test]
@@ -90,8 +90,8 @@ namespace CompilerUnitTests
         {
             Scanner lexer = CreateStringLexer("123");
             Token token = lexer.GetNextToken();
-            Assert.AreEqual(TokenType.IntLiteral, token.Type);
-            Assert.AreEqual("123", token.Content);
+            Assert.That(token.Type, Is.EqualTo(TokenType.IntLiteral));
+            Assert.That(token.Content, Is.EqualTo("123"));
         }
 
         [Test]
@@ -99,7 +99,7 @@ namespace CompilerUnitTests
         {
             Scanner lexer = CreateStringLexer(":=");
             Token token = lexer.GetNextToken();
-            Assert.AreEqual(TokenType.OpAssignment, token.Type);
+            Assert.That(token.Type, Is.EqualTo(TokenType.OpAssignment));
         }
 
         [Test]
@@ -107,7 +107,7 @@ namespace CompilerUnitTests
         {
             Scanner lexer = CreateStringLexer(":");
             Token token = lexer.GetNextToken();
-            Assert.AreEqual(TokenType.Colon, token.Type);
+            Assert.That(token.Type, Is.EqualTo(TokenType.Colon));
         }
 
         [Test]
@@ -115,7 +115,7 @@ namespace CompilerUnitTests
         {
             Scanner lexer = CreateStringLexer("-");
             Token token = lexer.GetNextToken();
-            Assert.AreEqual(TokenType.Minus, token.Type);
+            Assert.That(token.Type, Is.EqualTo(TokenType.Minus));
         }
 
         [Test]
@@ -123,7 +123,7 @@ namespace CompilerUnitTests
         {
             Scanner lexer = CreateStringLexer("+");
             Token token = lexer.GetNextToken();
-            Assert.AreEqual(TokenType.Plus, token.Type);
+            Assert.That(token.Type, Is.EqualTo(TokenType.Plus));
         }
 
         [Test]
@@ -131,7 +131,7 @@ namespace CompilerUnitTests
         {
             Scanner lexer = CreateStringLexer("*");
             Token token = lexer.GetNextToken();
-            Assert.AreEqual(TokenType.OpMultiply, token.Type);
+            Assert.That(token.Type, Is.EqualTo(TokenType.OpMultiply));
         }
 
         [Test]
@@ -139,7 +139,7 @@ namespace CompilerUnitTests
         {
             Scanner lexer = CreateStringLexer("/");
             Token token = lexer.GetNextToken();
-            Assert.AreEqual(TokenType.OpDivide, token.Type);
+            Assert.That(token.Type, Is.EqualTo(TokenType.OpDivide));
         }
 
         [Test]
@@ -147,7 +147,7 @@ namespace CompilerUnitTests
         {
             Scanner lexer = CreateStringLexer("<");
             Token token = lexer.GetNextToken();
-            Assert.AreEqual(TokenType.OpLess, token.Type);
+            Assert.That(token.Type, Is.EqualTo(TokenType.OpLess));
         }
 
         [Test]
@@ -155,7 +155,7 @@ namespace CompilerUnitTests
         {
             Scanner lexer = CreateStringLexer("=");
             Token token = lexer.GetNextToken();
-            Assert.AreEqual(TokenType.OpEquals, token.Type);
+            Assert.That(token.Type, Is.EqualTo(TokenType.OpEquals));
         }
 
         [Test]
@@ -163,7 +163,7 @@ namespace CompilerUnitTests
         {
             Scanner lexer = CreateStringLexer("and");
             Token token = lexer.GetNextToken();
-            Assert.AreEqual(TokenType.OpAnd, token.Type);
+            Assert.That(token.Type, Is.EqualTo(TokenType.OpAnd));
         }
 
         [Test]
@@ -171,7 +171,7 @@ namespace CompilerUnitTests
         {
             Scanner lexer = CreateStringLexer(";");
             Token token = lexer.GetNextToken();
-            Assert.AreEqual(TokenType.LineTerm, token.Type);
+            Assert.That(token.Type, Is.EqualTo(TokenType.LineTerm));
         }
 
         [Test]
@@ -179,8 +179,8 @@ namespace CompilerUnitTests
         {
             Scanner lexer = CreateStringLexer("\"some string\"");
             Token token = lexer.GetNextToken();
-            Assert.AreEqual(TokenType.StringLiteral, token.Type);
-            Assert.AreEqual("some string", token.Content);
+            Assert.That(token.Type, Is.EqualTo(TokenType.StringLiteral));
+            Assert.That(token.Content, Is.EqualTo("some string"));
         }
 
         /*
@@ -191,21 +191,21 @@ namespace CompilerUnitTests
         public void TestMultipleTokensWithoutSpaces()
         {
             Scanner lexer = CreateStringLexer("var:=(123\"lol\"asd");
-            Assert.AreEqual(TokenType.KwVar, lexer.GetNextToken().Type);
-            Assert.AreEqual(TokenType.OpAssignment, lexer.GetNextToken().Type);
-            Assert.AreEqual(TokenType.LParen, lexer.GetNextToken().Type);
-            Assert.AreEqual(TokenType.IntLiteral, lexer.GetNextToken().Type);
-            Assert.AreEqual(TokenType.StringLiteral, lexer.GetNextToken().Type);
-            Assert.AreEqual(TokenType.Identifier, lexer.GetNextToken().Type);
+            Assert.That(lexer.GetNextToken().Type, Is.EqualTo(TokenType.KwVar));
+            Assert.That(lexer.GetNextToken().Type, Is.EqualTo(TokenType.OpAssignment));
+            Assert.That(lexer.GetNextToken().Type, Is.EqualTo(TokenType.LParen));
+            Assert.That(lexer.GetNextToken().Type, Is.EqualTo(TokenType.IntLiteral));
+            Assert.That(lexer.GetNextToken().Type, Is.EqualTo(TokenType.StringLiteral));
+            Assert.That(lexer.GetNextToken().Type, Is.EqualTo(TokenType.Identifier));
         }
 
         [Test]
         public void TestOverlappingTokens()
         {
             Scanner lexer = CreateStringLexer("::==");
-            Assert.AreEqual(TokenType.Colon, lexer.GetNextToken().Type);
-            Assert.AreEqual(TokenType.OpAssignment, lexer.GetNextToken().Type);
-            Assert.AreEqual(TokenType.OpEquals, lexer.GetNextToken().Type);
+            Assert.That(lexer.GetNextToken().Type, Is.EqualTo(TokenType.Colon));
+            Assert.That(lexer.GetNextToken().Type, Is.EqualTo(TokenType.OpAssignment));
+            Assert.That(lexer.GetNextToken().Type, Is.EqualTo(TokenType.OpEquals));
         }
 
         [Test]
@@ -213,17 +213,17 @@ namespace CompilerUnitTests
         {
             Scanner lexer = CreateStringLexer("( := var");
             Token token = lexer.GetNextToken();
-            Assert.AreEqual(TokenType.LParen, token.Type);
-            Assert.AreEqual(1, token.Column);
-            Assert.AreEqual(1, token.Line);
+            Assert.That(token.Type, Is.EqualTo(TokenType.LParen));
+            Assert.That(token.Column, Is.EqualTo(1));
+            Assert.That(token.Line, Is.EqualTo(1));
             token = lexer.GetNextToken();
-            Assert.AreEqual(TokenType.OpAssignment, token.Type);
-            Assert.AreEqual(3, token.Column);
-            Assert.AreEqual(1, token.Line);
+            Assert.That(token.Type, Is.EqualTo(TokenType.OpAssignment));
+            Assert.That(token.Column, Is.EqualTo(3));
+            Assert.That(token.Line, Is.EqualTo(1));
             token = lexer.GetNextToken();
-            Assert.AreEqual(TokenType.KwVar, token.Type);
-            Assert.AreEqual(6, token.Column);
-            Assert.AreEqual(1, token.Line);
+            Assert.That(token.Type, Is.EqualTo(TokenType.KwVar));
+            Assert.That(token.Column, Is.EqualTo(6));
+            Assert.That(token.Line, Is.EqualTo(1));
         }
 
         [Test]
@@ -231,17 +231,17 @@ namespace CompilerUnitTests
         {
             Scanner lexer = CreateStringLexer("=\nassert var");
             Token token = lexer.GetNextToken();
-            Assert.AreEqual(TokenType.OpEquals, token.Type);
-            Assert.AreEqual(1, token.Column);
-            Assert.AreEqual(1, token.Line);
+            Assert.That(token.Type, Is.EqualTo(TokenType.OpEquals));
+            Assert.That(token.Column, Is.EqualTo(1));
+            Assert.That(token.Line, Is.EqualTo(1));
             token = lexer.GetNextToken();
-            Assert.AreEqual(TokenType.KwAssert, token.Type);
-            Assert.AreEqual(1, token.Column);
-            Assert.AreEqual(2, token.Line);
+            Assert.That(token.Type, Is.EqualTo(TokenType.KwAssert));
+            Assert.That(token.Column, Is.EqualTo(1));
+            Assert.That(token.Line, Is.EqualTo(2));
             token = lexer.GetNextToken();
-            Assert.AreEqual(TokenType.KwVar, token.Type);
-            Assert.AreEqual(8, token.Column);
-            Assert.AreEqual(2, token.Line);
+            Assert.That(token.Type, Is.EqualTo(TokenType.KwVar));
+            Assert.That(token.Column, Is.EqualTo(8));
+            Assert.That(token.Line, Is.EqualTo(2));
         }
 
         [Test]
@@ -249,20 +249,20 @@ namespace CompilerUnitTests
         {
             Scanner lexer = CreateStringLexer("begin \n\tvar");
             Token token = lexer.GetNextToken();
-            Assert.AreEqual(TokenType.KwBegin, token.Type);
-            Assert.AreEqual(1, token.Column);
-            Assert.AreEqual(1, token.Line);
+            Assert.That(token.Type, Is.EqualTo(TokenType.KwBegin));
+            Assert.That(token.Column, Is.EqualTo(1));
+            Assert.That(token.Line, Is.EqualTo(1));
             token = lexer.GetNextToken();
-            Assert.AreEqual(TokenType.KwVar, token.Type);
-            Assert.AreEqual(2, token.Column);
-            Assert.AreEqual(2, token.Line);
+            Assert.That(token.Type, Is.EqualTo(TokenType.KwVar));
+            Assert.That(token.Column, Is.EqualTo(2));
+            Assert.That(token.Line, Is.EqualTo(2));
         }
 
         [Test]
         public void TestStringEscapes()
         {
             Scanner lexer = CreateStringLexer("\"asd \\\"\\n\\t\\\\\"");
-            Assert.AreEqual("asd \"\n\t\\", lexer.GetNextToken().Content);
+            Assert.That(lexer.GetNextToken().Content, Is.EqualTo("asd \"\n\t\\"));
         }
 
         [Test]
@@ -319,93 +319,93 @@ namespace CompilerUnitTests
         public void Scanner_WithSingleLineComment_SkipsCommentedCode()
         {
             Scanner lexer = CreateStringLexer("var//int\nend");
-            Assert.AreEqual(TokenType.KwVar, lexer.GetNextToken().Type);
-            Assert.AreEqual(TokenType.KwEnd, lexer.GetNextToken().Type);
+            Assert.That(lexer.GetNextToken().Type, Is.EqualTo(TokenType.KwVar));
+            Assert.That(lexer.GetNextToken().Type, Is.EqualTo(TokenType.KwEnd));
         }
 
         [Test]
         public void Scanner_WithSingleLineCommentAndWhitespace_SkipsCommentedCode()
         {
             Scanner lexer = CreateStringLexer("var //int \n \n  while");
-            Assert.AreEqual(TokenType.KwVar, lexer.GetNextToken().Type);
-            Assert.AreEqual(TokenType.KwWhile, lexer.GetNextToken().Type);
+            Assert.That(lexer.GetNextToken().Type, Is.EqualTo(TokenType.KwVar));
+            Assert.That(lexer.GetNextToken().Type, Is.EqualTo(TokenType.KwWhile));
         }
 
         [Test]
         public void Scanner_WithSingleLineCommentAtBeginningOfLine_SkipsCommentedCode()
         {
             Scanner lexer = CreateStringLexer("//int\ndo");
-            Assert.AreEqual(TokenType.KwDo, lexer.GetNextToken().Type);
+            Assert.That(lexer.GetNextToken().Type, Is.EqualTo(TokenType.KwDo));
         }
 
         [Test]
         public void Scanner_WithMultipleSingleLineComments_SkipsCommentedCode()
         {
             Scanner lexer = CreateStringLexer("var //int//123\n  //456\nwhile");
-            Assert.AreEqual(TokenType.KwVar, lexer.GetNextToken().Type);
-            Assert.AreEqual(TokenType.KwWhile, lexer.GetNextToken().Type);
+            Assert.That(lexer.GetNextToken().Type, Is.EqualTo(TokenType.KwVar));
+            Assert.That(lexer.GetNextToken().Type, Is.EqualTo(TokenType.KwWhile));
         }
 
         [Test]
         public void Scanner_WithMultilineCommentOnOneLine_SkipsCommentedCode()
         {
             Scanner lexer = CreateStringLexer("var/*int*/\nend");
-            Assert.AreEqual(TokenType.KwVar, lexer.GetNextToken().Type);
-            Assert.AreEqual(TokenType.KwEnd, lexer.GetNextToken().Type);
+            Assert.That(lexer.GetNextToken().Type, Is.EqualTo(TokenType.KwVar));
+            Assert.That(lexer.GetNextToken().Type, Is.EqualTo(TokenType.KwEnd));
         }
 
         [Test]
         public void Scanner_WithMultilineCommentOnMultipleLines_SkipsCommentedCode()
         {
             Scanner lexer = CreateStringLexer("var/*int\n123\nabc*/\nprogram");
-            Assert.AreEqual(TokenType.KwVar, lexer.GetNextToken().Type);
-            Assert.AreEqual(TokenType.KwProgram, lexer.GetNextToken().Type);
+            Assert.That(lexer.GetNextToken().Type, Is.EqualTo(TokenType.KwVar));
+            Assert.That(lexer.GetNextToken().Type, Is.EqualTo(TokenType.KwProgram));
         }
 
         [Test]
         public void Scanner_WithNestedMultilineComments_SkipsCommentedCode()
         {
             Scanner lexer = CreateStringLexer("var/*int/*123*/abc*/\nthen");
-            Assert.AreEqual(TokenType.KwVar, lexer.GetNextToken().Type);
-            Assert.AreEqual(TokenType.KwThen, lexer.GetNextToken().Type);
+            Assert.That(lexer.GetNextToken().Type, Is.EqualTo(TokenType.KwVar));
+            Assert.That(lexer.GetNextToken().Type, Is.EqualTo(TokenType.KwThen));
         }
 
         [Test]
         public void Scanner_WithMultilineCommentAndWhitespace_SkipsCommentedCode()
         {
             Scanner lexer = CreateStringLexer("var \n/*int*/ \n \n  procedure");
-            Assert.AreEqual(TokenType.KwVar, lexer.GetNextToken().Type);
-            Assert.AreEqual(TokenType.KwProcedure, lexer.GetNextToken().Type);
+            Assert.That(lexer.GetNextToken().Type, Is.EqualTo(TokenType.KwVar));
+            Assert.That(lexer.GetNextToken().Type, Is.EqualTo(TokenType.KwProcedure));
         }
 
         [Test]
         public void Scanner_WithMultilineCommentEndingAtFileEnd_SkipsCommentedCode()
         {
             Scanner lexer = CreateStringLexer("var/*int\nstring*/");
-            Assert.AreEqual(TokenType.KwVar, lexer.GetNextToken().Type);
-            Assert.AreEqual(TokenType.EOF, lexer.GetNextToken().Type);
+            Assert.That(lexer.GetNextToken().Type, Is.EqualTo(TokenType.KwVar));
+            Assert.That(lexer.GetNextToken().Type, Is.EqualTo(TokenType.EOF));
         }
 
         [Test]
         public void Scanner_WithMultilineCommentAtBeginningOfLine_SkipsCommentedCode()
         {
             Scanner lexer = CreateStringLexer("/*int*/return");
-            Assert.AreEqual(TokenType.KwReturn, lexer.GetNextToken().Type);
+            Assert.That(lexer.GetNextToken().Type, Is.EqualTo(TokenType.KwReturn));
         }
 
         [Test]
         public void Scanner_WithMultilineCommentBetweenCodeOnSameLine_SkipsCommentedCode()
         {
             Scanner lexer = CreateStringLexer("var /* int */ of");
-            Assert.AreEqual(TokenType.KwVar, lexer.GetNextToken().Type);
-            Assert.AreEqual(TokenType.KwOf, lexer.GetNextToken().Type);
+            Assert.That(lexer.GetNextToken().Type, Is.EqualTo(TokenType.KwVar));
+            Assert.That(lexer.GetNextToken().Type, Is.EqualTo(TokenType.KwOf));
         }
 
         [Test]
         public void Scanner_WithUnclosedMultilineComment_ThrowsException()
         {
             Scanner lexer = CreateStringLexer("var/*int\nstring");
-            Assert.AreEqual(TokenType.KwVar, lexer.GetNextToken().Type);
+            Assert.That(lexer.GetNextToken().Type, Is.EqualTo(TokenType.KwVar));
             lexer.GetNextToken();
             string errorMessage = Errors.GetErrors()[0].ToString();
             Assert.That(errorMessage, Is.EqualTo("LexicalError: EOF while scanning comment beginning at line 1 column 4"));
@@ -415,24 +415,24 @@ namespace CompilerUnitTests
         public void Scanner_WithSingleAndMultilineComments_SkipsCommentedCode()
         {
             Scanner lexer = CreateStringLexer("var /* int */ //123\n/*321*/while");
-            Assert.AreEqual(TokenType.KwVar, lexer.GetNextToken().Type);
-            Assert.AreEqual(TokenType.KwWhile, lexer.GetNextToken().Type);
+            Assert.That(lexer.GetNextToken().Type, Is.EqualTo(TokenType.KwVar));
+            Assert.That(lexer.GetNextToken().Type, Is.EqualTo(TokenType.KwWhile));
         }
 
         [Test]
         public void Scanner_WithSingleLineCommentInsideMultiline_SkipsCommentedCode()
         {
             Scanner lexer = CreateStringLexer("var /* //int */var");
-            Assert.AreEqual(TokenType.KwVar, lexer.GetNextToken().Type);
-            Assert.AreEqual(TokenType.KwVar, lexer.GetNextToken().Type);
+            Assert.That(lexer.GetNextToken().Type, Is.EqualTo(TokenType.KwVar));
+            Assert.That(lexer.GetNextToken().Type, Is.EqualTo(TokenType.KwVar));
         }
 
         [Test]
         public void Scanner_WithMultilineCommentInsideSingleLine_SkipsCommentedCode()
         {
             Scanner lexer = CreateStringLexer("var ///*123\nreturn");
-            Assert.AreEqual(TokenType.KwVar, lexer.GetNextToken().Type);
-            Assert.AreEqual(TokenType.KwReturn, lexer.GetNextToken().Type);
+            Assert.That(lexer.GetNextToken().Type, Is.EqualTo(TokenType.KwVar));
+            Assert.That(lexer.GetNextToken().Type, Is.EqualTo(TokenType.KwReturn));
         }
     }
 }
