@@ -95,8 +95,9 @@ namespace MiniPascalCompiler
             }
             else if (char.IsNumber(Source.CurrentChar.Value))
             {
-                string tokenContent = Source.ReadWhile(peeked => char.IsDigit(peeked));
-                return new Token(TokenType.IntLiteral, newTokenLine, newTokenColumn, tokenContent);
+                TokenType type;
+                string tokenContent = BuildNumberLiteral(out type);
+                return new Token(type, newTokenLine, newTokenColumn, tokenContent);
             }
             else if (char.IsLetter(Source.CurrentChar.Value))
             {
@@ -123,6 +124,41 @@ namespace MiniPascalCompiler
                     ErrorType.LexicalError);
                 return GetNextToken();
             }
+        }
+
+        private string BuildNumberLiteral(out TokenType newTokenType)
+        {
+            Func<char, bool> isDigit = peeked => char.IsDigit(peeked);
+            StringBuilder tokenContent = new StringBuilder();
+            tokenContent.Append(Source.ReadWhile(isDigit));
+            if (Source.Peek() == '.' && Source.Peek(1).HasValue && isDigit(Source.Peek(1).Value))
+            {
+                Source.ReadNext();
+                newTokenType = TokenType.RealLiteral;
+                tokenContent.Append(Source.ReadWhile(isDigit));
+                if (Source.Peek() == 'e')
+                {
+                    Source.ReadNext();
+                    if (Source.Peek() == '+' || Source.Peek() == '-' || isDigit(Source.Peek().Value))
+                    {
+                        Source.ReadNext();
+                        tokenContent.Append('e' + Source.ReadWhile(isDigit));
+                    }
+                    else
+                    {
+                        ErrorHandler.AddError(
+                            String.Format("Expected digits while reading exponent at line {0} column {1}",
+                            Source.CurrentLine, Source.CurrentColumn), ErrorType.LexicalError);
+                    }
+                }
+                return tokenContent.ToString();
+            }
+            else
+            {
+                newTokenType = TokenType.IntLiteral;
+                return tokenContent.ToString();
+            }
+            
         }
 
         private string BuildStringLiteral()
@@ -265,9 +301,9 @@ namespace MiniPascalCompiler
             return CurrentChar;
         }
 
-        public string ReadWhile(System.Func<char, bool> testFunc)
+        public string ReadWhile(Func<char, bool> testFunc)
         {
-            System.Text.StringBuilder content = new System.Text.StringBuilder();
+            StringBuilder content = new StringBuilder();
             content.Append(CurrentChar);
             while (Peek().HasValue && testFunc(Peek().Value))
             {
