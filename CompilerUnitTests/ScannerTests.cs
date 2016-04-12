@@ -503,6 +503,36 @@ namespace CompilerUnitTests
             Assert.That(token.Type, Is.EqualTo(TokenType.KwVar));
         }
 
+        [Test]
+        public void TestNoDigitsAfterExponent()
+        {
+            Scanner lexer = CreateStringLexer("1.2e");
+            Token token = lexer.GetNextToken();
+            string errorMessage = Errors.GetErrors()[0].ToString();
+            Assert.That(errorMessage, Is.EqualTo("LexicalError: Expected digits while reading exponent at line 1 column 4"));
+            Assert.That(token.Content, Is.EqualTo("1.2"));
+        }
+
+        [Test]
+        public void TestNoDigitsAfterExponentSign()
+        {
+            Scanner lexer = CreateStringLexer("15.02e-");
+            Token token = lexer.GetNextToken();
+            string errorMessage = Errors.GetErrors()[0].ToString();
+            Assert.That(errorMessage, Is.EqualTo("LexicalError: Expected digits while reading exponent at line 1 column 7"));
+            Assert.That(token.Content, Is.EqualTo("15.02"));
+        }
+
+        [Test]
+        public void TestBadExponentDoesNotEatNextToken()
+        {
+            Scanner lexer = CreateStringLexer("15.02e;2.4e-;");
+            Assert.That(lexer.GetNextToken().Type, Is.EqualTo(TokenType.RealLiteral));
+            Assert.That(lexer.GetNextToken().Type, Is.EqualTo(TokenType.LineTerm));
+            Assert.That(lexer.GetNextToken().Type, Is.EqualTo(TokenType.RealLiteral));
+            Assert.That(lexer.GetNextToken().Type, Is.EqualTo(TokenType.LineTerm));
+        }
+
         /*
         Tests for comments
         */

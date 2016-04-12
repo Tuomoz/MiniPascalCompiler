@@ -139,10 +139,15 @@ namespace MiniPascalCompiler
                 if (Source.Peek() == 'e')
                 {
                     Source.ReadNext();
-                    if (Source.Peek() == '+' || Source.Peek() == '-' || isDigit(Source.Peek().Value))
+                    string exponentSign = "";
+                    if (Source.Peek() == '+' || Source.Peek() == '-')
+                    {
+                        exponentSign = Source.ReadNext().ToString();
+                    }
+                    if (Source.Peek().HasValue && isDigit(Source.Peek().Value))
                     {
                         Source.ReadNext();
-                        tokenContent.Append('e' + Source.ReadWhile(isDigit));
+                        tokenContent.Append("e" + exponentSign + Source.ReadWhile(isDigit));
                     }
                     else
                     {
