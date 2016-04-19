@@ -35,12 +35,32 @@ namespace MiniPascalCompiler
         public StructuredStmt(int line, int column) : base(line, column) { }
     }
 
+    abstract class TypeNode : AstNode
+    {
+        public TypeNode(int line, int column) : base(line, column) { }
+    }
+
     abstract class Expression : AstNode
     {
         public ExprType Type { get; set; } = ExprType.VoidType;
         public object ExprValue;
 
         public Expression(int line, int column) : base(line, column) { }
+    }
+
+    class SimpleType : TypeNode
+    {
+        public IdentifierExpr TypeName { get; set; }
+
+        public SimpleType(int line, int column) : base(line, column) { }
+    }
+
+    class ArrayType : TypeNode
+    {
+        public IdentifierExpr TypeName { get; set; }
+        public int Size { get; set; }
+
+        public ArrayType(int line, int column) : base(line, column) { }
     }
 
     class ArgumentList : AstNode
@@ -58,7 +78,7 @@ namespace MiniPascalCompiler
         public struct Parameter
         {
             IdentifierExpr Identifier;
-            IdentifierExpr Type;
+            TypeNode Type;
         }
 
         public List<Parameter> Parameters { get; private set; }
@@ -82,7 +102,7 @@ namespace MiniPascalCompiler
     class VarDeclarationStmt : Statement
     {
         public List<IdentifierExpr> Identifiers { get; set; }
-        public IdentifierExpr Type { get; set; }
+        public TypeNode Type { get; set; }
 
         public VarDeclarationStmt(int line, int column) : base(line, column)
         {
@@ -104,7 +124,7 @@ namespace MiniPascalCompiler
         public IdentifierExpr Identifier { get; set; }
         public BlockStmt ProcedureBlock { get; set; }
         public ParameterList Parameters { get; set; }
-        public IdentifierExpr Type { get; set; }
+        public TypeNode ReturnType { get; set; }
 
         public FunctionDeclarationStmt(int line, int column) : base(line, column) { }
     }
