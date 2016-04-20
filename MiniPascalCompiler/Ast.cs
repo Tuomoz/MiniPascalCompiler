@@ -18,26 +18,36 @@ namespace MiniPascalCompiler
             Line = line;
             Column = column;
         }
+
+        public AstNode(Token token)
+        {
+            Line = token.Line;
+            Column = token.Column;
+        }
     }
 
     abstract class Statement : AstNode
     {
         public Statement(int line, int column) : base(line, column) { }
+        public Statement(Token token) : base(token) { }
     }
 
     abstract class SimpleStmt : Statement
     {
         public SimpleStmt(int line, int column) : base(line, column) { }
+        public SimpleStmt(Token token) : base(token) { }
     }
 
     abstract class StructuredStmt : Statement
     {
         public StructuredStmt(int line, int column) : base(line, column) { }
+        public StructuredStmt(Token token) : base(token) { }
     }
 
     abstract class TypeNode : AstNode
     {
         public TypeNode(int line, int column) : base(line, column) { }
+        public TypeNode(Token token) : base(token) { }
     }
 
     abstract class Expression : AstNode
@@ -46,6 +56,16 @@ namespace MiniPascalCompiler
         public object ExprValue;
 
         public Expression(int line, int column) : base(line, column) { }
+        public Expression(Token token) : base(token) { }
+    }
+
+    class ProgramNode : AstNode
+    {
+        public IdentifierExpr Identifier { get; set; }
+        public BlockStmt Block { get; set; }
+
+        public ProgramNode(int line, int column) : base(line, column) { }
+        public ProgramNode(Token token) : base(token) { }
     }
 
     class SimpleType : TypeNode
@@ -53,6 +73,7 @@ namespace MiniPascalCompiler
         public IdentifierExpr TypeName { get; set; }
 
         public SimpleType(int line, int column) : base(line, column) { }
+        public SimpleType(Token token) : base(token) { }
     }
 
     class ArrayType : TypeNode
@@ -61,16 +82,15 @@ namespace MiniPascalCompiler
         public int Size { get; set; }
 
         public ArrayType(int line, int column) : base(line, column) { }
+        public ArrayType(Token token) : base(token) { }
     }
 
     class ArgumentList : AstNode
     {
-        public List<Expression> Arguments { get; set; }
+        public List<Expression> Arguments { get; set; } = new List<Expression>();
 
-        public ArgumentList(int line, int column): base(line, column)
-        {
-            Arguments = new List<Expression>();
-        }
+        public ArgumentList(int line, int column): base(line, column) { }
+        public ArgumentList(Token token) : base(token) { }
     }
 
     class ParameterList : AstNode
@@ -81,33 +101,27 @@ namespace MiniPascalCompiler
             TypeNode Type;
         }
 
-        public List<Parameter> Parameters { get; private set; }
+        public List<Parameter> Parameters { get; private set; } = new List<Parameter>();
 
-        public ParameterList(int line, int column) : base(line, column)
-        {
-            Parameters = new List<Parameter>();
-        }
+        public ParameterList(int line, int column) : base(line, column) { }
+        public ParameterList(Token token) : base(token) { }
     }
 
     class BlockStmt : AstNode
     {
-        public List<Statement> Statements { get; set; }
+        public List<Statement> Statements { get; set; } = new List<Statement>();
 
-        public BlockStmt(int line, int column) : base(line, column)
-        {
-            Statements = new List<Statement>();
-        }
+        public BlockStmt(int line, int column) : base(line, column) { }
+        public BlockStmt(Token token) : base(token) { }
     }
 
     class VarDeclarationStmt : Statement
     {
-        public List<IdentifierExpr> Identifiers { get; set; }
+        public List<IdentifierExpr> Identifiers { get; set; } = new List<IdentifierExpr>();
         public TypeNode Type { get; set; }
 
-        public VarDeclarationStmt(int line, int column) : base(line, column)
-        {
-            Identifiers = new List<IdentifierExpr>();
-        }
+        public VarDeclarationStmt(int line, int column) : base(line, column) { }
+        public VarDeclarationStmt(Token token) : base(token) { }
     }
 
     class ProcedureDeclarationStmt : Statement
@@ -117,6 +131,7 @@ namespace MiniPascalCompiler
         public ParameterList Parameters { get; set; }
 
         public ProcedureDeclarationStmt(int line, int column) : base(line, column) { }
+        public ProcedureDeclarationStmt(Token token) : base(token) { }
     }
 
     class FunctionDeclarationStmt : Statement
@@ -127,6 +142,7 @@ namespace MiniPascalCompiler
         public TypeNode ReturnType { get; set; }
 
         public FunctionDeclarationStmt(int line, int column) : base(line, column) { }
+        public FunctionDeclarationStmt(Token token) : base(token) { }
     }
 
     class IdentifierExpr : Expression
@@ -137,6 +153,10 @@ namespace MiniPascalCompiler
         {
             IdentifierName = identifierName;
         }
+        public IdentifierExpr(Token token) : base(token)
+        {
+            IdentifierName = token.Content;
+        }
     }
 
     class AssignmentStmt : SimpleStmt
@@ -145,6 +165,7 @@ namespace MiniPascalCompiler
         public Expression AssignmentExpr { get; set; }
 
         public AssignmentStmt(int line, int column) : base(line, column) { }
+        public AssignmentStmt(Token token) : base(token) { }
     }
 
     class WhileStmt : StructuredStmt
@@ -153,6 +174,7 @@ namespace MiniPascalCompiler
         public Statement Body { get; set; }
 
         public WhileStmt(int line, int column) : base(line, column) { }
+        public WhileStmt(Token token) : base(token) { }
     }
 
     class IfStmt : StructuredStmt
@@ -162,6 +184,7 @@ namespace MiniPascalCompiler
         public Statement FalseStatement { get; set; }
 
         public IfStmt(int line, int column) : base(line, column) { }
+        public IfStmt(Token token) : base(token) { }
     }
 
     class CallStmt : SimpleStmt
@@ -170,6 +193,7 @@ namespace MiniPascalCompiler
         public ArgumentList Arguments { get; set; }
 
         public CallStmt(int line, int column) : base(line, column) { }
+        public CallStmt(Token token) : base(token) { }
     }
 
     class ReturnStmt : SimpleStmt
@@ -177,6 +201,7 @@ namespace MiniPascalCompiler
         public Expression ReturnExpression { get; set; }
 
         public ReturnStmt(int line, int column) : base(line, column) { }
+        public ReturnStmt(Token token) : base(token) { }
     }
 
     class AssertStmt : SimpleStmt
@@ -184,6 +209,7 @@ namespace MiniPascalCompiler
         public Expression AssertExpr { get; set; }
 
         public AssertStmt(int line, int column) : base(line, column) { }
+        public AssertStmt(Token token) : base(token) { }
     }
 
     class BinaryExpr : Expression
@@ -193,6 +219,7 @@ namespace MiniPascalCompiler
         public Expression Right { get; set; }
 
         public BinaryExpr(int line, int column) : base(line, column) { }
+        public BinaryExpr(Token token) : base(token) { }
     }
 
     class UnaryExpr : Expression
@@ -201,15 +228,18 @@ namespace MiniPascalCompiler
         public Expression Expr { get; set; }
 
         public UnaryExpr(int line, int column) : base(line, column) { }
+        public UnaryExpr(Token token) : base(token) { }
     }
 
     class IntLiteralExpr : Expression
     {
         public IntLiteralExpr(int line, int column) : base(line, column) { }
+        public IntLiteralExpr(Token token) : base(token) { }
     }
 
     class StringLiteralExpr : Expression
     {
         public StringLiteralExpr(int line, int column) : base(line, column) { }
+        public StringLiteralExpr(Token token) : base(token) { }
     }
 }
