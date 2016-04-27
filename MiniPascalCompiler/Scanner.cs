@@ -40,6 +40,7 @@ namespace MiniPascalCompiler
             SymbolTokens.Add(",", TokenType.Comma);
             KeywordTokens.Add("var", TokenType.KwVar);
             KeywordTokens.Add("while", TokenType.KwWhile);
+            KeywordTokens.Add("if", TokenType.KwIf);
             KeywordTokens.Add("end", TokenType.KwEnd);
             KeywordTokens.Add("do", TokenType.KwDo);
             KeywordTokens.Add("assert", TokenType.KwAssert);
@@ -370,7 +371,7 @@ namespace MiniPascalCompiler
         LineTerm, Colon, EOF, KwProgram, KwProcedure, KwFunction, KwArray,
         KwOf, KwBegin, KwReturn, KwThen, KwElse, OpOr, Comma, LBracket,
         RBracket, OpModulus, OpDot, OpMore, OpLessOrEquals, OpMoreOrEquals,
-        OpNotEquals, 
+        OpNotEquals, KwIf,
     };
 
     public class Token

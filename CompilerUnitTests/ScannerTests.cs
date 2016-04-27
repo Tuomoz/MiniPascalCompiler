@@ -113,6 +113,14 @@ namespace CompilerUnitTests
         }
 
         [Test]
+        public void TestIfKwToken()
+        {
+            Scanner lexer = CreateStringLexer("if");
+            Token token = lexer.GetNextToken();
+            Assert.That(token.Type, Is.EqualTo(TokenType.KwIf));
+        }
+
+        [Test]
         public void TestEndKwToken()
         {
             Scanner lexer = CreateStringLexer("end");
