@@ -6,8 +6,13 @@ using System.Threading.Tasks;
 
 namespace MiniPascalCompiler
 {
-    public enum ExprType { IntType, StringType, BoolType, VoidType };
-    public enum Operator { Plus, Minus, Times, Divide, Less, Equals, And, Not }
+    public enum ExprType { Int, Real, String, Bool, Void };
+    public enum Operator
+    {
+        Plus, Minus, Times, Divide, Less, Equals, And, Not,
+        Modulus, LessOrEquals, More, MoreOrEquals, NotEquals
+    }
+    public enum ExprSign { Plus, Minus }
 
     abstract class AstNode
     {
@@ -52,8 +57,8 @@ namespace MiniPascalCompiler
 
     abstract class Expression : AstNode
     {
-        public ExprType Type { get; set; } = ExprType.VoidType;
-        public object ExprValue;
+        public ExprType Type { get; set; } = ExprType.Void;
+        public ExprSign Sign { get; set; } = ExprSign.Plus;
 
         public Expression(int line, int column) : base(line, column) { }
         public Expression(Token token) : base(token) { }
@@ -70,7 +75,7 @@ namespace MiniPascalCompiler
 
     class SimpleType : TypeNode
     {
-        public IdentifierExpr TypeName { get; set; }
+        public ExprType Type { get; set; }
 
         public SimpleType(int line, int column) : base(line, column) { }
         public SimpleType(Token token) : base(token) { }
@@ -78,7 +83,7 @@ namespace MiniPascalCompiler
 
     class ArrayType : TypeNode
     {
-        public IdentifierExpr TypeName { get; set; }
+        public ExprType Type { get; set; }
         public int Size { get; set; }
 
         public ArrayType(int line, int column) : base(line, column) { }
@@ -99,15 +104,28 @@ namespace MiniPascalCompiler
         {
             IdentifierExpr Identifier;
             TypeNode Type;
+            bool ReferenceParameter;
+
+            public Parameter(IdentifierExpr identifier, TypeNode type, bool referenceParameter)
+            {
+                Identifier = identifier;
+                Type = type;
+                ReferenceParameter = referenceParameter;
+            }
         }
 
         public List<Parameter> Parameters { get; private set; } = new List<Parameter>();
 
         public ParameterList(int line, int column) : base(line, column) { }
         public ParameterList(Token token) : base(token) { }
+
+        public void AddParameter(IdentifierExpr identifier, TypeNode type, bool referenceParameter)
+        {
+            Parameters.Add(new Parameter(identifier, type, referenceParameter));
+        }
     }
 
-    class BlockStmt : AstNode
+    class BlockStmt : Statement
     {
         public List<Statement> Statements { get; set; } = new List<Statement>();
 
@@ -220,6 +238,25 @@ namespace MiniPascalCompiler
 
         public BinaryExpr(int line, int column) : base(line, column) { }
         public BinaryExpr(Token token) : base(token) { }
+
+        public void SetOperatorFromToken(Token token)
+        {
+            switch(token.Type)
+            {
+                case TokenType.Plus: Op = Operator.Plus; break;
+                case TokenType.Minus: Op = Operator.Minus; break;
+                case TokenType.OpMultiply: Op = Operator.Times; break;
+                case TokenType.OpDivide: Op = Operator.Divide; break;
+                case TokenType.OpModulus: Op = Operator.Modulus; break;
+                case TokenType.OpLess: Op = Operator.Less; break;
+                case TokenType.OpLessOrEquals: Op = Operator.LessOrEquals; break;
+                case TokenType.OpMore: Op = Operator.More; break;
+                case TokenType.OpMoreOrEquals: Op = Operator.MoreOrEquals; break;
+                case TokenType.OpEquals: Op = Operator.Equals; break;
+                case TokenType.OpNotEquals: Op = Operator.NotEquals; break;
+                case TokenType.OpAnd: Op = Operator.And; break;
+            }
+        }
     }
 
     class UnaryExpr : Expression
@@ -233,13 +270,61 @@ namespace MiniPascalCompiler
 
     class IntLiteralExpr : Expression
     {
+        public int Value { get; set; }
+
         public IntLiteralExpr(int line, int column) : base(line, column) { }
-        public IntLiteralExpr(Token token) : base(token) { }
+        public IntLiteralExpr(Token token) : base(token)
+        {
+            Value = int.Parse(token.Content);
+        }
     }
 
     class StringLiteralExpr : Expression
     {
+        public string Value { get; set; }
+
         public StringLiteralExpr(int line, int column) : base(line, column) { }
-        public StringLiteralExpr(Token token) : base(token) { }
+        public StringLiteralExpr(Token token) : base(token)
+        {
+            Value = token.Content;
+        }
+    }
+
+    class RealLiteralExpr : Expression
+    {
+        public float Value { get; set; }
+
+        public RealLiteralExpr(int line, int column) : base(line, column) { }
+        public RealLiteralExpr(Token token) : base(token)
+        {
+            Value = float.Parse(token.Content);
+        }
+    }
+
+    class CallExpr : Expression
+    {
+        public IdentifierExpr ProcedureId { get; set; }
+        public ArgumentList Arguments { get; set; }
+
+        public CallExpr(int line, int column) : base(line, column) { }
+        public CallExpr(Token token) : base(token) { }
+    }
+
+    class MemberAccessExpr : Expression
+    {
+        public Expression Expr { get; set; }
+        public IdentifierExpr MemberId { get; set; }
+
+        public MemberAccessExpr(int line, int column) : base(line, column) { }
+        public MemberAccessExpr(Token token) : base(token) { }
+    }
+
+    class ArrayAccessExpr : Expression
+    {
+        public Expression SubscriptExpr { get; set; }
+        public IdentifierExpr ArrayIdentifier { get; set; }
+
+        public ArrayAccessExpr(int line, int column) : base(line, column) { }
+        public ArrayAccessExpr(Token token) : base(token) { }
     }
 }
