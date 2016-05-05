@@ -8,10 +8,11 @@ namespace MiniPascalCompiler
 {
     public class Parser
     {
-        private Scanner Scanner;
+        private IScanner Scanner;
         private ErrorHandler Errors;
         private Token CurrentToken;
         private Token AcceptedToken;
+        private Queue<Token> TokenBuffer = new Queue<Token>();
 
         private Dictionary<TokenType, Func<Statement>> StatementParsers;
         private Dictionary<string, ExprType> KnownTypes = new Dictionary<string, ExprType>()
@@ -22,7 +23,7 @@ namespace MiniPascalCompiler
             { "bool", ExprType.Bool }
         };
 
-        public Parser(Scanner scanner, ErrorHandler errors)
+        public Parser(IScanner scanner, ErrorHandler errors)
         {
             Scanner = scanner;
             Errors = errors;
@@ -42,6 +43,67 @@ namespace MiniPascalCompiler
             };
         }
 
+        public ProgramNode Parse()
+        {
+            ProgramNode program = new ProgramNode(CurrentToken);
+            Match(TokenType.KwProgram);
+            program.Identifier = ParseIdentifier();
+            Match(TokenType.LineTerm);
+            program.Block = ParseBlock();
+            Match(TokenType.OpDot);
+            return program;
+        }
+
+        private void NextToken()
+        {
+            if (TokenBuffer.Count > 0)
+            {
+                CurrentToken = TokenBuffer.Dequeue();
+            }
+            else
+            {
+                CurrentToken = Scanner.GetNextToken();
+            }
+        }
+
+        private bool MatchPeek(int offset, params TokenType[] excepted)
+        {
+            Token peeked = CurrentToken;
+            if (TokenBuffer.Count > offset)
+            {
+                peeked = TokenBuffer.ElementAt(offset);
+            }
+            offset -= TokenBuffer.Count;
+            for (int i = 0; i < offset; i++)
+            {
+                peeked = Scanner.GetNextToken();
+                TokenBuffer.Enqueue(peeked);
+            }
+            return excepted.Contains(peeked.Type);
+        }
+
+        private bool Accept(params TokenType[] excepted)
+        {
+            if (excepted.Contains(CurrentToken.Type))
+            {
+                AcceptedToken = CurrentToken;
+                NextToken();
+                return true;
+            }
+            return false;
+        }
+
+        private Token Match(TokenType excepted)
+        {
+            if (CurrentToken.Type != excepted)
+            {
+                throw new Exception();
+            }
+            AcceptedToken = CurrentToken;
+            NextToken();
+            return AcceptedToken;
+        }
+
         private FunctionDeclarationStmt ParseFunctionDeclaration()
         {
             Match(TokenType.KwFunction);
@@ -50,6 +112,7 @@ namespace MiniPascalCompiler
             Match(TokenType.LParen);
             statement.Parameters = ParseParameters();
             Match(TokenType.RParen);
+            Match(TokenType.Colon);
             statement.ReturnType = ParseType();
             Match(TokenType.LineTerm);
             statement.ProcedureBlock = ParseBlock();
@@ -100,6 +163,7 @@ namespace MiniPascalCompiler
             Match(TokenType.KwWhile);
             WhileStmt statement = new WhileStmt(AcceptedToken);
             statement.TestExpr = ParseExpression();
+            Match(TokenType.KwDo);
             statement.Body = ParseStatement();
             return statement;
         }
@@ -116,44 +180,6 @@ namespace MiniPascalCompiler
                 statement.FalseStatement = ParseStatement();
             }
             return statement;
-        }
-
-        public ProgramNode Parse()
-        {
-            ProgramNode program = new ProgramNode(CurrentToken);
-            Match(TokenType.KwProgram);
-            Match(TokenType.Identifier);
-            Match(TokenType.LineTerm);
-            program.Block = ParseBlock();
-            Match(TokenType.OpDot);
-            return program;
-        }
-
-        private void NextToken()
-        {
-            CurrentToken = Scanner.GetNextToken();
-        }
-
-        private bool Accept(params TokenType[] excepted)
-        {
-            if (excepted.Contains(CurrentToken.Type))
-            {
-                AcceptedToken = CurrentToken;
-                NextToken();
-                return true;
-            }
-            return false;
-        }
-
-        private Token Match(TokenType excepted)
-        {
-            if (CurrentToken.Type != excepted)
-            {
-                throw new Exception();
-            }
-            AcceptedToken = CurrentToken;
-            NextToken();
-            return AcceptedToken;
         }
 
         private BlockStmt ParseBlock()
@@ -202,38 +228,55 @@ namespace MiniPascalCompiler
         {
             Match(TokenType.KwReturn);
             ReturnStmt statement = new ReturnStmt(AcceptedToken);
-            statement.ReturnExpression = ParseExpression();
+            if (MatchPeek(0, Expression.FirstSet))
+            {
+                statement.ReturnExpression = ParseExpression();
+            }
             return statement;
         }
 
         private Statement ParseAssignmentOrCall()
         {
-            Match(TokenType.Identifier);
-            Token identifier = AcceptedToken;
-            if (Accept(TokenType.LParen))
+            if (MatchPeek(1, TokenType.LParen))
             {
-                return ParseCall(identifier);
-            }
-            else if (Accept(TokenType.OpAssignment))
-            {
-                return ParseAssignment(identifier);
+                return ParseCall();
             }
             else
-                throw new Exception();
+            {
+                return ParseAssignment();
+            }
         }
 
-        private AssignmentStmt ParseAssignment(Token identifier)
+        private AssignmentStmt ParseAssignment()
         {
-            AssignmentStmt assignment = new AssignmentStmt(identifier);
-            assignment.Identifier = new IdentifierExpr(identifier);
+            AssignmentStmt assignment = new AssignmentStmt(CurrentToken);
+            assignment.Identifier = ParseVariable();
+            Match(TokenType.OpAssignment);
             assignment.AssignmentExpr = ParseExpression();
             return assignment;
         }
 
-        private CallStmt ParseCall(Token identifier)
+        private IVariableExpr ParseVariable()
         {
-            CallStmt call = new CallStmt(identifier);
-            call.ProcedureId = new IdentifierExpr(identifier);
+            Token idToken = Match(TokenType.Identifier);
+            var id = new IdentifierExpr(AcceptedToken);
+            if (Accept(TokenType.LBracket))
+            {
+                ArrayVariableExpr expr = new ArrayVariableExpr(idToken);
+                expr.ArrayIdentifier = id;
+                expr.SubscriptExpr = ParseExpression();
+                Match(TokenType.RBracket);
+                return expr;
+            }
+            return id;
+        }
+
+        private CallStmt ParseCall()
+        {
+            Match(TokenType.Identifier);
+            CallStmt call = new CallStmt(AcceptedToken);
+            call.ProcedureId = new IdentifierExpr(AcceptedToken);
+            Match(TokenType.LParen);
             call.Arguments = ParseArguments();
             Match(TokenType.RParen);
             return call;
@@ -358,7 +401,7 @@ namespace MiniPascalCompiler
         private Expression ParseFactor()
         {
             Expression factor;
-            if (Accept(TokenType.Identifier))
+            if (CurrentToken.Type == TokenType.Identifier)
             {
                 factor = ParseCallOrVarExpr();
             }
@@ -400,27 +443,17 @@ namespace MiniPascalCompiler
 
         private Expression ParseCallOrVarExpr()
         {
-            Token identifier = AcceptedToken;
-            if (Accept(TokenType.LParen))
+            if (MatchPeek(1, TokenType.LParen))
             {
-                CallExpr call = new CallExpr(identifier);
-                call.ProcedureId = new IdentifierExpr(identifier);
+                Match(TokenType.Identifier);
+                CallExpr call = new CallExpr(AcceptedToken);
+                call.ProcedureId = new IdentifierExpr(AcceptedToken);
+                Match(TokenType.LParen);
                 call.Arguments = ParseArguments();
                 Match(TokenType.RParen);
                 return call;
             }
-            else if (Accept(TokenType.LBracket))
-            {
-                ArrayAccessExpr expr = new ArrayAccessExpr(identifier);
-                expr.ArrayIdentifier = new IdentifierExpr(identifier);
-                expr.SubscriptExpr = ParseExpression();
-                Match(TokenType.RBracket);
-                return expr;
-            }
-            else
-            {
-                return new IdentifierExpr(identifier);
-            }
+            return (Expression) ParseVariable();
         }
     }
 }
