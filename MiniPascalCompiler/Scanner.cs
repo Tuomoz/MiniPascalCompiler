@@ -6,7 +6,12 @@ using System.Threading.Tasks;
 
 namespace MiniPascalCompiler
 {
-    public class Scanner
+    public interface IScanner
+    {
+        Token GetNextToken();
+    }
+
+    public class Scanner : IScanner
     {
         private SourceReader Source;
         private ErrorHandler ErrorHandler;
