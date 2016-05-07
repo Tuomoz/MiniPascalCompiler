@@ -15,6 +15,13 @@ namespace CompilerUnitTests
     {
         ProgramNode expected;
 
+        [OneTimeSetUp]
+        public void Setup()
+        {
+            AssertionOptions.AssertEquivalencyUsing(options => options.AllowingInfiniteRecursion());
+            AssertionOptions.AssertEquivalencyUsing(options => options.RespectingRuntimeTypes());
+        }
+
         [SetUp]
         public void Init()
         {
@@ -120,6 +127,36 @@ namespace CompilerUnitTests
             declr.Identifier = new IdentifierExpr(0, 0, "proc");
             declr.Parameters = new ParameterList(0, 0);
             declr.Parameters.AddParameter(new IdentifierExpr(0, 0, "par1"), new SimpleType(0, 0, ExprType.Real), false);
+            declr.ProcedureBlock = new BlockStmt(0, 0);
+            var call = new CallStmt(0, 0);
+            call.ProcedureId = new IdentifierExpr(0, 0, "writeln");
+            declr.ProcedureBlock.Statements.Add(call);
+            expected.Block.Statements.Add(declr);
+
+            program.ShouldBeEquivalentTo(expected);
+        }
+
+        [Test]
+        public void TestProcedureDeclarationWithoutParameters()
+        {
+            var programSource = new TokenList()
+            {
+                { TokenType.KwProcedure },
+                { TokenType.Identifier, "proc" },
+                { TokenType.LParen },
+                { TokenType.RParen },
+                { TokenType.LineTerm },
+                { TokenType.KwBegin },
+                { TokenType.Identifier, "writeln" },
+                { TokenType.LParen },
+                { TokenType.RParen },
+                { TokenType.KwEnd }
+            };
+            Parser parser = new Parser(CreateMockScanner(programSource), new ErrorHandler());
+            ProgramNode program = parser.Parse();
+
+            var declr = new ProcedureDeclarationStmt(0, 0);
+            declr.Identifier = new IdentifierExpr(0, 0, "proc");
             declr.ProcedureBlock = new BlockStmt(0, 0);
             var call = new CallStmt(0, 0);
             call.ProcedureId = new IdentifierExpr(0, 0, "writeln");
@@ -430,6 +467,326 @@ namespace CompilerUnitTests
             whileStmt.TestExpr = new IdentifierExpr(0, 0, "true");
             whileStmt.Body = new ReturnStmt(0, 0);
             expected.Block.Statements.Add(whileStmt);
+            program.ShouldBeEquivalentTo(expected);
+        }
+
+        [Test]
+        public void TestExpressionMinusSign()
+        {
+            var programSource = new TokenList()
+            {
+                { TokenType.Identifier, "x" },
+                { TokenType. OpAssignment },
+                { TokenType.Minus },
+                { TokenType.IntLiteral, "5" }
+            };
+            Parser parser = new Parser(CreateMockScanner(programSource), new ErrorHandler());
+            ProgramNode program = parser.Parse();
+
+            var expr = new IntLiteralExpr(0, 0, 5);
+            expr.Sign = ExprSign.Minus;
+            var assignment = new AssignmentStmt(0, 0);
+            assignment.Identifier = new IdentifierExpr(0, 0, "x");
+            assignment.AssignmentExpr = expr;
+            expected.Block.Statements.Add(assignment);
+            program.ShouldBeEquivalentTo(expected);
+        }
+
+        [Test]
+        public void TestRealLiteral()
+        {
+            var programSource = new TokenList()
+            {
+                { TokenType.Identifier, "x" },
+                { TokenType. OpAssignment },
+                { TokenType.RealLiteral, "2.4e3" }
+            };
+            Parser parser = new Parser(CreateMockScanner(programSource), new ErrorHandler());
+            ProgramNode program = parser.Parse();
+
+            var expr = new IntLiteralExpr(0, 0, 5);
+            expr.Sign = ExprSign.Minus;
+            var assignment = new AssignmentStmt(0, 0);
+            assignment.Identifier = new IdentifierExpr(0, 0, "x");
+            assignment.AssignmentExpr = new RealLiteralExpr(0, 0, 2400);
+            expected.Block.Statements.Add(assignment);
+            program.ShouldBeEquivalentTo(expected);
+        }
+
+        [Test]
+        public void TestMultipleAdditions()
+        {
+            // 1 + 2 + 3
+            var programSource = new TokenList()
+            {
+                { TokenType.Identifier, "x" },
+                { TokenType. OpAssignment },
+                { TokenType.IntLiteral, "1" },
+                { TokenType.Plus },
+                { TokenType.IntLiteral, "2" },
+                { TokenType.Minus },
+                { TokenType.IntLiteral, "3" }
+            };
+            Parser parser = new Parser(CreateMockScanner(programSource), new ErrorHandler());
+            ProgramNode program = parser.Parse();
+
+            var expr1 = new BinaryExpr(0, 0);
+            expr1.Left = new IntLiteralExpr(0, 0, 1);
+            expr1.Right = new IntLiteralExpr(0, 0, 2);
+            expr1.Op = Operator.Plus;
+            var expr2 = new BinaryExpr(0, 0);
+            expr2.Left = expr1;
+            expr2.Right = new IntLiteralExpr(0, 0, 3);
+            expr2.Op = Operator.Minus;
+            var assignment = new AssignmentStmt(0, 0);
+            assignment.AssignmentExpr = expr2;
+            assignment.Identifier = new IdentifierExpr(0, 0, "x");
+            expected.Block.Statements.Add(assignment);
+            program.ShouldBeEquivalentTo(expected);
+        }
+
+        [Test]
+        public void TestMultipleMultiplications()
+        {
+            // 1 + 2 + 3
+            var programSource = new TokenList()
+            {
+                { TokenType.Identifier, "x" },
+                { TokenType. OpAssignment },
+                { TokenType.IntLiteral, "1" },
+                { TokenType.OpMultiply },
+                { TokenType.IntLiteral, "2" },
+                { TokenType.OpDivide },
+                { TokenType.IntLiteral, "3" }
+            };
+            Parser parser = new Parser(CreateMockScanner(programSource), new ErrorHandler());
+            ProgramNode program = parser.Parse();
+
+            var expr1 = new BinaryExpr(0, 0);
+            expr1.Left = new IntLiteralExpr(0, 0, 1);
+            expr1.Right = new IntLiteralExpr(0, 0, 2);
+            expr1.Op = Operator.Times;
+            var expr2 = new BinaryExpr(0, 0);
+            expr2.Left = expr1;
+            expr2.Right = new IntLiteralExpr(0, 0, 3);
+            expr2.Op = Operator.Divide;
+            var assignment = new AssignmentStmt(0, 0);
+            assignment.AssignmentExpr = expr2;
+            assignment.Identifier = new IdentifierExpr(0, 0, "x");
+            expected.Block.Statements.Add(assignment);
+            program.ShouldBeEquivalentTo(expected);
+        }
+
+        [Test]
+        public void TestAddAndMultiplicationPrecedence()
+        {
+            // 1 + 2 * 3
+            var programSource = new TokenList()
+            {
+                { TokenType.Identifier, "x" },
+                { TokenType. OpAssignment },
+                { TokenType.IntLiteral, "1" },
+                { TokenType.Plus },
+                { TokenType.IntLiteral, "2" },
+                { TokenType.OpMultiply },
+                { TokenType.IntLiteral, "3" }
+            };
+            Parser parser = new Parser(CreateMockScanner(programSource), new ErrorHandler());
+            ProgramNode program = parser.Parse();
+
+            var expr1 = new BinaryExpr(0, 0);
+            expr1.Left = new IntLiteralExpr(0, 0, 2);
+            expr1.Right = new IntLiteralExpr(0, 0, 3);
+            expr1.Op = Operator.Times;
+            var expr2 = new BinaryExpr(0, 0);
+            expr2.Left = new IntLiteralExpr(0, 0, 1);
+            expr2.Right = expr1;
+            expr2.Op = Operator.Plus;
+            var assignment = new AssignmentStmt(0, 0);
+            assignment.AssignmentExpr = expr2;
+            assignment.Identifier = new IdentifierExpr(0, 0, "x");
+            expected.Block.Statements.Add(assignment);
+            program.ShouldBeEquivalentTo(expected);
+        }
+
+        [Test]
+        public void TestExpressionInParenthesis()
+        {
+            // (1 + 2) * 3
+            var programSource = new TokenList()
+            {
+                { TokenType.Identifier, "x" },
+                { TokenType. OpAssignment },
+                { TokenType.LParen },
+                { TokenType.IntLiteral, "1" },
+                { TokenType.Plus },
+                { TokenType.IntLiteral, "2" },
+                { TokenType.RParen },
+                { TokenType.OpMultiply },
+                { TokenType.IntLiteral, "3" }
+            };
+            Parser parser = new Parser(CreateMockScanner(programSource), new ErrorHandler());
+            ProgramNode program = parser.Parse();
+
+            var expr1 = new BinaryExpr(0, 0);
+            expr1.Left = new IntLiteralExpr(0, 0, 1);
+            expr1.Right = new IntLiteralExpr(0, 0, 2);
+            expr1.Op = Operator.Plus;
+            var expr2 = new BinaryExpr(0, 0);
+            expr2.Left = expr1;
+            expr2.Right = new IntLiteralExpr(0, 0, 3);
+            expr2.Op = Operator.Times;
+            var assignment = new AssignmentStmt(0, 0);
+            assignment.AssignmentExpr = expr2;
+            assignment.Identifier = new IdentifierExpr(0, 0, "x");
+            expected.Block.Statements.Add(assignment);
+            program.ShouldBeEquivalentTo(expected);
+        }
+
+        [Test]
+        public void TestRelationalExpression()
+        {
+            // 1 + 2 < 3 * 4
+            var programSource = new TokenList()
+            {
+                { TokenType.Identifier, "x" },
+                { TokenType. OpAssignment },
+                { TokenType.IntLiteral, "1" },
+                { TokenType.Plus },
+                { TokenType.IntLiteral, "2" },
+                { TokenType.OpLess },
+                { TokenType.IntLiteral, "3" },
+                { TokenType.OpMultiply },
+                { TokenType.IntLiteral, "4" }
+            };
+            Parser parser = new Parser(CreateMockScanner(programSource), new ErrorHandler());
+            ProgramNode program = parser.Parse();
+
+            var leftExpr = new BinaryExpr(0, 0);
+            leftExpr.Left = new IntLiteralExpr(0, 0, 1);
+            leftExpr.Right = new IntLiteralExpr(0, 0, 2);
+            leftExpr.Op = Operator.Plus;
+            var rightExpr = new BinaryExpr(0, 0);
+            rightExpr.Left = new IntLiteralExpr(0, 0, 3);
+            rightExpr.Right = new IntLiteralExpr(0, 0, 4);
+            rightExpr.Op = Operator.Times;
+            var comp = new BinaryExpr(0, 0);
+            comp.Left = leftExpr;
+            comp.Right = rightExpr;
+            comp.Op = Operator.Less;
+            var assignment = new AssignmentStmt(0, 0);
+            assignment.AssignmentExpr = comp;
+            assignment.Identifier = new IdentifierExpr(0, 0, "x");
+            expected.Block.Statements.Add(assignment);
+            program.ShouldBeEquivalentTo(expected);
+        }
+
+        [Test]
+        public void TestCallExpr()
+        {
+            // func("asd")
+            var programSource = new TokenList()
+            {
+                { TokenType.Identifier, "x" },
+                { TokenType. OpAssignment },
+                { TokenType.Identifier, "func" },
+                { TokenType.LParen },
+                { TokenType.StringLiteral, "asd" },
+                { TokenType.RParen }
+            };
+            Parser parser = new Parser(CreateMockScanner(programSource), new ErrorHandler());
+            ProgramNode program = parser.Parse();
+
+            var call = new CallExpr(0, 0);
+            call.Arguments = new ArgumentList(0, 0);
+            call.Arguments.Arguments.Add(new StringLiteralExpr(0, 0, "asd"));
+            call.ProcedureId = new IdentifierExpr(0, 0, "func");
+            var assignment = new AssignmentStmt(0, 0);
+            assignment.AssignmentExpr = call;
+            assignment.Identifier = new IdentifierExpr(0, 0, "x");
+            expected.Block.Statements.Add(assignment);
+            program.ShouldBeEquivalentTo(expected);
+        }
+
+        [Test]
+        public void TestNotExpr()
+        {
+            // not (1 > 2)
+            var programSource = new TokenList()
+            {
+                { TokenType.Identifier, "x" },
+                { TokenType. OpAssignment },
+                { TokenType.OpNot },
+                { TokenType.LParen },
+                { TokenType.IntLiteral, "1" },
+                { TokenType.OpMore },
+                { TokenType.IntLiteral, "2" },
+                { TokenType.RParen }
+            };
+            Parser parser = new Parser(CreateMockScanner(programSource), new ErrorHandler());
+            ProgramNode program = parser.Parse();
+
+            var comp = new BinaryExpr(0, 0);
+            comp.Left = new IntLiteralExpr(0, 0, 1);
+            comp.Right = new IntLiteralExpr(0, 0, 2);
+            comp.Op = Operator.More;
+            var unary = new UnaryExpr(0, 0);
+            unary.Op = Operator.Not;
+            unary.Expr = comp;
+            var assignment = new AssignmentStmt(0, 0);
+            assignment.AssignmentExpr = unary;
+            assignment.Identifier = new IdentifierExpr(0, 0, "x");
+            expected.Block.Statements.Add(assignment);
+            program.ShouldBeEquivalentTo(expected);
+        }
+
+        [Test]
+        public void TestMemberAccessExpr()
+        {
+            // not (1 > 2)
+            var programSource = new TokenList()
+            {
+                { TokenType.Identifier, "x" },
+                { TokenType. OpAssignment },
+                { TokenType.Identifier, "arr" },
+                { TokenType.OpDot },
+                { TokenType.Identifier, "size" }
+            };
+            Parser parser = new Parser(CreateMockScanner(programSource), new ErrorHandler());
+            ProgramNode program = parser.Parse();
+
+            var expr = new MemberAccessExpr(0, 0);
+            expr.AccessedExpr = new IdentifierExpr(0, 0, "arr");
+            expr.MemberId = new IdentifierExpr(0, 0, "size");
+            var assignment = new AssignmentStmt(0, 0);
+            assignment.AssignmentExpr = expr;
+            assignment.Identifier = new IdentifierExpr(0, 0, "x");
+            expected.Block.Statements.Add(assignment);
+            program.ShouldBeEquivalentTo(expected);
+        }
+
+        [Test]
+        public void TestMultipleStatements()
+        {
+            var programSource = new TokenList()
+            {
+                { TokenType.KwAssert },
+                { TokenType.Identifier, "true" },
+                { TokenType.LineTerm },
+                { TokenType.Identifier, "writeln" },
+                { TokenType.LParen },
+                { TokenType.RParen },
+                { TokenType.LineTerm }
+            };
+            Parser parser = new Parser(CreateMockScanner(programSource), new ErrorHandler());
+            ProgramNode program = parser.Parse();
+
+            var assert = new AssertStmt(0, 0);
+            assert.AssertExpr = new IdentifierExpr(0, 0, "true");
+            var call = new CallStmt(0, 0);
+            call.ProcedureId = new IdentifierExpr(0, 0, "writeln");
+            expected.Block.Statements.Add(assert);
+            expected.Block.Statements.Add(call);
             program.ShouldBeEquivalentTo(expected);
         }
 
