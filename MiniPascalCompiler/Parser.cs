@@ -121,12 +121,12 @@ namespace MiniPascalCompiler
 
         private ParameterList ParseParameters()
         {
-            ParameterList parameters = new ParameterList(CurrentToken);
             if (CurrentToken.Type == TokenType.RParen) // No parameters
             {
-                return parameters;
+                return null;
             }
 
+            ParameterList parameters = new ParameterList(CurrentToken);
             do
             {
                 bool referenceParameter = Accept(TokenType.KwVar);
@@ -284,12 +284,12 @@ namespace MiniPascalCompiler
 
         private ArgumentList ParseArguments()
         {
-            ArgumentList arguments = new ArgumentList(CurrentToken);
             if (CurrentToken.Type == TokenType.RParen) // No arguments
             {
-                return arguments;
+                return null;
             }
 
+            ArgumentList arguments = new ArgumentList(CurrentToken);
             do
             {
                 arguments.Arguments.Add(ParseExpression());
@@ -367,18 +367,20 @@ namespace MiniPascalCompiler
         private Expression ParseSimpleExpression()
         {
             Token firstTermToken = CurrentToken;
+            ExprSign termSign = ExprSign.Plus;
             if (Accept(TokenType.Minus, TokenType.Plus))
             {
-                Token sign = AcceptedToken;
+                termSign = AcceptedToken.Type == TokenType.Minus ? ExprSign.Minus : ExprSign.Plus;
             }
             Expression left = ParseTerm();
-            if (Accept(TokenType.Plus, TokenType.Minus, TokenType.OpOr))
+            left.Sign = termSign;
+            while (Accept(TokenType.Plus, TokenType.Minus, TokenType.OpOr))
             {
                 BinaryExpr expr = new BinaryExpr(firstTermToken);
                 expr.SetOperatorFromToken(AcceptedToken);
                 expr.Left = left;
                 expr.Right = ParseTerm();
-                return expr;
+                left = expr;
             }
             return left;
         }
@@ -387,13 +389,13 @@ namespace MiniPascalCompiler
         {
             Token firstTermToken = CurrentToken;
             Expression left = ParseFactor();
-            if (Accept(TokenType.OpMultiply, TokenType.OpDivide, TokenType.OpModulus, TokenType.OpAnd))
+            while (Accept(TokenType.OpMultiply, TokenType.OpDivide, TokenType.OpModulus, TokenType.OpAnd))
             {
                 BinaryExpr expr = new BinaryExpr(firstTermToken);
                 expr.SetOperatorFromToken(AcceptedToken);
                 expr.Left = left;
                 expr.Right = ParseFactor();
-                return expr;
+                left = expr;
             }
             return left;
         }
@@ -426,6 +428,7 @@ namespace MiniPascalCompiler
             else if(Accept(TokenType.OpNot))
             {
                 UnaryExpr expr = new UnaryExpr(AcceptedToken);
+                expr.Op = Operator.Not;
                 expr.Expr = ParseFactor();
                 factor = expr;
             }
@@ -434,7 +437,7 @@ namespace MiniPascalCompiler
             if (Accept(TokenType.OpDot))
             {
                 MemberAccessExpr expr = new MemberAccessExpr(AcceptedToken);
-                expr.Expr = factor;
+                expr.AccessedExpr = factor;
                 expr.MemberId = ParseIdentifier();
                 return expr;
             }

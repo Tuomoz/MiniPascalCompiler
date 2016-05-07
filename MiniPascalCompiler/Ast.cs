@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -314,10 +315,13 @@ namespace MiniPascalCompiler
     {
         public float Value { get; set; }
 
-        public RealLiteralExpr(int line, int column) : base(line, column) { }
+        public RealLiteralExpr(int line, int column, float value) : base(line, column)
+        {
+            Value = value;
+        }
         public RealLiteralExpr(Token token) : base(token)
         {
-            Value = float.Parse(token.Content);
+            Value = float.Parse(token.Content, CultureInfo.InvariantCulture);
         }
     }
 
@@ -332,7 +336,7 @@ namespace MiniPascalCompiler
 
     public class MemberAccessExpr : Expression
     {
-        public Expression Expr { get; set; }
+        public Expression AccessedExpr { get; set; }
         public IdentifierExpr MemberId { get; set; }
 
         public MemberAccessExpr(int line, int column) : base(line, column) { }
