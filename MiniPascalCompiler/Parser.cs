@@ -317,19 +317,18 @@ namespace MiniPascalCompiler
             if (Accept(TokenType.Identifier))
             {
                 SimpleType node = new SimpleType(AcceptedToken);
-                node.Type = ParseTypeName();
+                node.ExprType = ParseTypeName();
                 return node;
             }
             else if (Accept(TokenType.KwArray))
             {
                 ArrayType node = new ArrayType(AcceptedToken);
                 Match(TokenType.LBracket);
-                Match(TokenType.IntLiteral);
-                node.Size = int.Parse(AcceptedToken.Content);
+                node.SizeExpr = ParseExpression();
                 Match(TokenType.RBracket);
                 Match(TokenType.KwOf);
                 Match(TokenType.Identifier);
-                node.Type = ParseTypeName();
+                node.ExprType = ParseTypeName();
                 return node;
             }
             else

@@ -96,7 +96,9 @@ namespace CompilerUnitTests
 
             var declr = new VarDeclarationStmt(0, 0);
             declr.Identifiers.Add("asd");
-            declr.Type = new ArrayType(0, 0, ExprType.Int, 3);
+            var type = new ArrayType(0, 0, ExprType.Int);
+            type.SizeExpr = new IntLiteralExpr(0, 0, 3);
+            declr.Type = type;
             expected.Block.Statements.Add(declr);
             program.ShouldBeEquivalentTo(expected);
         }

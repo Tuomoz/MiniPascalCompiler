@@ -71,6 +71,8 @@ namespace MiniPascalCompiler
 
     public abstract class TypeNode : AstNode
     {
+        public ExprType ExprType { get; set; }
+
         public TypeNode(int line, int column) : base(line, column) { }
         public TypeNode(Token token) : base(token) { }
     }
@@ -102,24 +104,20 @@ namespace MiniPascalCompiler
 
     public class SimpleType : TypeNode
     {
-        public ExprType Type { get; set; }
-
         public SimpleType(int line, int column, ExprType type) : base(line, column)
         {
-            Type = type;
+            ExprType = type;
         }
         public SimpleType(Token token) : base(token) { }
     }
 
     public class ArrayType : TypeNode
     {
-        public ExprType Type { get; set; }
-        public int Size { get; set; }
+        public Expression SizeExpr { get; set; }
 
-        public ArrayType(int line, int column, ExprType type, int size) : base(line, column)
+        public ArrayType(int line, int column, ExprType type) : base(line, column)
         {
-            Type = type;
-            Size = size;
+            ExprType = type;
         }
         public ArrayType(Token token) : base(token) { }
     }
