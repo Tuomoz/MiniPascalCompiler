@@ -125,8 +125,7 @@ namespace CompilerUnitTests
 
             var declr = new ProcedureDeclarationStmt(0, 0);
             declr.Identifier = "proc";
-            declr.Parameters = new ParameterList(0, 0);
-            declr.Parameters.AddParameter("par1", new SimpleType(0, 0, ExprType.Real), false);
+            declr.AddParameter("par1", new SimpleType(0, 0, ExprType.Real), false);
             declr.ProcedureBlock = new BlockStmt(0, 0);
             var call = new CallStmt(0, 0);
             call.ProcedureId = "writeln";
@@ -188,8 +187,7 @@ namespace CompilerUnitTests
 
             var declr = new ProcedureDeclarationStmt(0, 0);
             declr.Identifier = "proc";
-            declr.Parameters = new ParameterList(0, 0);
-            declr.Parameters.AddParameter("par1", new SimpleType(0, 0, ExprType.Real), false);
+            declr.AddParameter("par1", new SimpleType(0, 0, ExprType.Real), false);
             declr.ProcedureBlock = new BlockStmt(0, 0);
             declr.ProcedureBlock.Statements.Add(new ReturnStmt(0, 0));
             expected.Block.Statements.Add(declr);
@@ -226,9 +224,8 @@ namespace CompilerUnitTests
 
             var declr = new ProcedureDeclarationStmt(0, 0);
             declr.Identifier = "proc";
-            declr.Parameters = new ParameterList(0, 0);
-            declr.Parameters.AddParameter("par1", new SimpleType(0, 0, ExprType.Real), false);
-            declr.Parameters.AddParameter("par2", new SimpleType(0, 0, ExprType.String), true);
+            declr.AddParameter("par1", new SimpleType(0, 0, ExprType.Real), false);
+            declr.AddParameter("par2", new SimpleType(0, 0, ExprType.String), true);
             declr.ProcedureBlock = new BlockStmt(0, 0);
             var call = new CallStmt(0, 0);
             call.ProcedureId = "writeln";
@@ -264,8 +261,7 @@ namespace CompilerUnitTests
             var declr = new FunctionDeclarationStmt(0, 0);
             declr.Identifier = "func";
             declr.ReturnType = new SimpleType(0, 0, ExprType.Bool);
-            declr.Parameters = new ParameterList(0, 0);
-            declr.Parameters.AddParameter("par1", new SimpleType(0, 0, ExprType.Int), false);
+            declr.AddParameter("par1", new SimpleType(0, 0, ExprType.Int), false);
             declr.ProcedureBlock = new BlockStmt(0, 0);
             var returnStmt = new ReturnStmt(0, 0);
             returnStmt.ReturnExpression = new IntLiteralExpr(0, 0, 123);
@@ -353,8 +349,8 @@ namespace CompilerUnitTests
             ProgramNode program = parser.Parse();
 
             var call = new CallStmt(0, 0);
-            call.Arguments = new ArgumentList(0, 0);
-            call.Arguments.Arguments.Add(new IntLiteralExpr(0, 0, 2));
+            call.Arguments = new List<Expression>();
+            call.Arguments.Add(new IntLiteralExpr(0, 0, 2));
             call.ProcedureId = "func";
             expected.Block.Statements.Add(call);
             program.ShouldBeEquivalentTo(expected);
@@ -376,9 +372,9 @@ namespace CompilerUnitTests
             ProgramNode program = parser.Parse();
 
             var call = new CallStmt(0, 0);
-            call.Arguments = new ArgumentList(0, 0);
-            call.Arguments.Arguments.Add(new IntLiteralExpr(0, 0, 2));
-            call.Arguments.Arguments.Add(new StringLiteralExpr(0, 0, "arg"));
+            call.Arguments = new List<Expression>();
+            call.Arguments.Add(new IntLiteralExpr(0, 0, 2));
+            call.Arguments.Add(new StringLiteralExpr(0, 0, "arg"));
             call.ProcedureId = "func";
             expected.Block.Statements.Add(call);
             program.ShouldBeEquivalentTo(expected);
@@ -698,8 +694,8 @@ namespace CompilerUnitTests
             ProgramNode program = parser.Parse();
 
             var call = new CallExpr(0, 0);
-            call.Arguments = new ArgumentList(0, 0);
-            call.Arguments.Arguments.Add(new StringLiteralExpr(0, 0, "asd"));
+            call.Arguments = new List<Expression>();
+            call.Arguments.Add(new StringLiteralExpr(0, 0, "asd"));
             call.CalleeId = "func";
             var assignment = new AssignmentStmt(0, 0);
             assignment.AssignmentExpr = call;

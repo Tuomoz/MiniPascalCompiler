@@ -119,21 +119,21 @@ namespace MiniPascalCompiler
             return statement;
         }
 
-        private ParameterList ParseParameters()
+        private List<Parameter> ParseParameters()
         {
             if (CurrentToken.Type == TokenType.RParen) // No parameters
             {
                 return null;
             }
 
-            ParameterList parameters = new ParameterList(CurrentToken);
+            var parameters = new List<Parameter>();
             do
             {
                 bool referenceParameter = Accept(TokenType.KwVar);
                 string identifier = ParseIdentifier();
                 Match(TokenType.Colon);
                 TypeNode type = ParseType();
-                parameters.AddParameter(identifier, type, referenceParameter);
+                parameters.Add(new Parameter(identifier, type, referenceParameter));
             }
             while (Accept(TokenType.Comma));
             return parameters;
@@ -282,17 +282,17 @@ namespace MiniPascalCompiler
             return call;
         }
 
-        private ArgumentList ParseArguments()
+        private List<Expression> ParseArguments()
         {
             if (CurrentToken.Type == TokenType.RParen) // No arguments
             {
                 return null;
             }
 
-            ArgumentList arguments = new ArgumentList(CurrentToken);
+            var arguments = new List<Expression>();
             do
             {
-                arguments.Arguments.Add(ParseExpression());
+                arguments.Add(ParseExpression());
             }
             while (Accept(TokenType.Comma));
             return arguments;

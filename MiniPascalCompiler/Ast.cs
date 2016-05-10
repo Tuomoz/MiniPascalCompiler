@@ -50,6 +50,25 @@ namespace MiniPascalCompiler
         public StructuredStmt(Token token) : base(token) { }
     }
 
+    public abstract class CallableDeclarationStmt : SimpleStmt
+    {
+        public string Identifier { get; set; }
+        public BlockStmt ProcedureBlock { get; set; }
+        public List<Parameter> Parameters;
+
+        public CallableDeclarationStmt(int line, int column) : base(line, column) { }
+        public CallableDeclarationStmt(Token token) : base(token) { }
+
+        public void AddParameter(string identifier, TypeNode type, bool referenceParameter)
+        {
+            if (Parameters == null)
+            {
+                Parameters = new List<Parameter>();
+            }
+            Parameters.Add(new Parameter(identifier, type, referenceParameter));
+        }
+    }
+
     public abstract class TypeNode : AstNode
     {
         public TypeNode(int line, int column) : base(line, column) { }
@@ -105,38 +124,17 @@ namespace MiniPascalCompiler
         public ArrayType(Token token) : base(token) { }
     }
 
-    public class ArgumentList : AstNode
+    public struct Parameter
     {
-        public List<Expression> Arguments { get; set; } = new List<Expression>();
+        public readonly string Identifier;
+        public readonly TypeNode Type;
+        public readonly bool ReferenceParameter;
 
-        public ArgumentList(int line, int column): base(line, column) { }
-        public ArgumentList(Token token) : base(token) { }
-    }
-
-    public class ParameterList : AstNode
-    {
-        public struct Parameter
+        public Parameter(string identifier, TypeNode type, bool referenceParameter)
         {
-            public readonly string Identifier;
-            public readonly TypeNode Type;
-            public readonly bool ReferenceParameter;
-
-            public Parameter(string identifier, TypeNode type, bool referenceParameter)
-            {
-                Identifier = identifier;
-                Type = type;
-                ReferenceParameter = referenceParameter;
-            }
-        }
-
-        public List<Parameter> Parameters { get; private set; } = new List<Parameter>();
-
-        public ParameterList(int line, int column) : base(line, column) { }
-        public ParameterList(Token token) : base(token) { }
-
-        public void AddParameter(string identifier, TypeNode type, bool referenceParameter)
-        {
-            Parameters.Add(new Parameter(identifier, type, referenceParameter));
+            Identifier = identifier;
+            Type = type;
+            ReferenceParameter = referenceParameter;
         }
     }
 
@@ -157,21 +155,14 @@ namespace MiniPascalCompiler
         public VarDeclarationStmt(Token token) : base(token) { }
     }
 
-    public class ProcedureDeclarationStmt : Statement
+    public class ProcedureDeclarationStmt : CallableDeclarationStmt
     {
-        public string Identifier { get; set; }
-        public BlockStmt ProcedureBlock { get; set; }
-        public ParameterList Parameters { get; set; }
-
         public ProcedureDeclarationStmt(int line, int column) : base(line, column) { }
         public ProcedureDeclarationStmt(Token token) : base(token) { }
     }
 
-    public class FunctionDeclarationStmt : Statement
+    public class FunctionDeclarationStmt : CallableDeclarationStmt
     {
-        public string Identifier { get; set; }
-        public BlockStmt ProcedureBlock { get; set; }
-        public ParameterList Parameters { get; set; }
         public TypeNode ReturnType { get; set; }
 
         public FunctionDeclarationStmt(int line, int column) : base(line, column) { }
@@ -223,7 +214,7 @@ namespace MiniPascalCompiler
     public class CallStmt : SimpleStmt
     {
         public string ProcedureId { get; set; }
-        public ArgumentList Arguments { get; set; }
+        public List<Expression> Arguments { get; set; }
 
         public CallStmt(int line, int column) : base(line, column) { }
         public CallStmt(Token token) : base(token) { }
@@ -328,7 +319,7 @@ namespace MiniPascalCompiler
     public class CallExpr : Expression
     {
         public string CalleeId { get; set; }
-        public ArgumentList Arguments { get; set; }
+        public List<Expression> Arguments { get; set; }
 
         public CallExpr(int line, int column) : base(line, column) { }
         public CallExpr(Token token) : base(token) { }
