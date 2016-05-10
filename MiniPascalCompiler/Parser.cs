@@ -130,7 +130,7 @@ namespace MiniPascalCompiler
             do
             {
                 bool referenceParameter = Accept(TokenType.KwVar);
-                IdentifierExpr identifier = ParseIdentifier();
+                string identifier = ParseIdentifier();
                 Match(TokenType.Colon);
                 TypeNode type = ParseType();
                 parameters.AddParameter(identifier, type, referenceParameter);
@@ -139,10 +139,10 @@ namespace MiniPascalCompiler
             return parameters;
         }
 
-        private IdentifierExpr ParseIdentifier()
+        private string ParseIdentifier()
         {
             Match(TokenType.Identifier);
-            return new IdentifierExpr(AcceptedToken);
+            return AcceptedToken.Content;
         }
 
         private ProcedureDeclarationStmt ParseProcedureDeclaration()
@@ -250,7 +250,7 @@ namespace MiniPascalCompiler
         private AssignmentStmt ParseAssignment()
         {
             AssignmentStmt assignment = new AssignmentStmt(CurrentToken);
-            assignment.Identifier = ParseVariable();
+            assignment.Variable = ParseVariable();
             Match(TokenType.OpAssignment);
             assignment.AssignmentExpr = ParseExpression();
             return assignment;
@@ -259,7 +259,7 @@ namespace MiniPascalCompiler
         private IVariableExpr ParseVariable()
         {
             Token idToken = Match(TokenType.Identifier);
-            var id = new IdentifierExpr(AcceptedToken);
+            string id = AcceptedToken.Content;
             if (Accept(TokenType.LBracket))
             {
                 ArrayVariableExpr expr = new ArrayVariableExpr(idToken);
@@ -268,14 +268,14 @@ namespace MiniPascalCompiler
                 Match(TokenType.RBracket);
                 return expr;
             }
-            return id;
+            return new VariableExpr(idToken);
         }
 
         private CallStmt ParseCall()
         {
             Match(TokenType.Identifier);
             CallStmt call = new CallStmt(AcceptedToken);
-            call.ProcedureId = new IdentifierExpr(AcceptedToken);
+            call.ProcedureId = AcceptedToken.Content;
             Match(TokenType.LParen);
             call.Arguments = ParseArguments();
             Match(TokenType.RParen);
@@ -304,8 +304,7 @@ namespace MiniPascalCompiler
             VarDeclarationStmt declaration = new VarDeclarationStmt(AcceptedToken);
             do
             {
-                Match(TokenType.Identifier);
-                declaration.Identifiers.Add(new IdentifierExpr(AcceptedToken));
+                declaration.Identifiers.Add(ParseIdentifier());
             }
             while (Accept(TokenType.Comma));
             Match(TokenType.Colon);
@@ -450,7 +449,7 @@ namespace MiniPascalCompiler
             {
                 Match(TokenType.Identifier);
                 CallExpr call = new CallExpr(AcceptedToken);
-                call.ProcedureId = new IdentifierExpr(AcceptedToken);
+                call.CalleeId = AcceptedToken.Content;
                 Match(TokenType.LParen);
                 call.Arguments = ParseArguments();
                 Match(TokenType.RParen);

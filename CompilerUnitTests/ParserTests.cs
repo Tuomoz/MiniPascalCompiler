@@ -26,7 +26,7 @@ namespace CompilerUnitTests
         public void Init()
         {
             expected = new ProgramNode(0, 0);
-            expected.Identifier = new IdentifierExpr(0, 0, "testprog");
+            expected.Identifier = "testprog";
             expected.Block = new BlockStmt(0, 0);
         }
 
@@ -44,7 +44,7 @@ namespace CompilerUnitTests
             ProgramNode program = parser.Parse();
 
             var declr = new VarDeclarationStmt(0, 0);
-            declr.Identifiers.Add(new IdentifierExpr(0, 0, "asd"));
+            declr.Identifiers.Add("asd");
             declr.Type = new SimpleType(0, 0, ExprType.Int);
             expected.Block.Statements.Add(declr);
             program.ShouldBeEquivalentTo(expected);
@@ -68,9 +68,9 @@ namespace CompilerUnitTests
             ProgramNode program = parser.Parse();
 
             var declr = new VarDeclarationStmt(0, 0);
-            declr.Identifiers.Add(new IdentifierExpr(0, 0, "asd"));
-            declr.Identifiers.Add(new IdentifierExpr(0, 0, "lol"));
-            declr.Identifiers.Add(new IdentifierExpr(0, 0, "foo"));
+            declr.Identifiers.Add("asd");
+            declr.Identifiers.Add("lol");
+            declr.Identifiers.Add("foo");
             declr.Type = new SimpleType(0, 0, ExprType.Bool);
             expected.Block.Statements.Add(declr);
             program.ShouldBeEquivalentTo(expected);
@@ -95,7 +95,7 @@ namespace CompilerUnitTests
             ProgramNode program = parser.Parse();
 
             var declr = new VarDeclarationStmt(0, 0);
-            declr.Identifiers.Add(new IdentifierExpr(0, 0, "asd"));
+            declr.Identifiers.Add("asd");
             declr.Type = new ArrayType(0, 0, ExprType.Int, 3);
             expected.Block.Statements.Add(declr);
             program.ShouldBeEquivalentTo(expected);
@@ -124,12 +124,12 @@ namespace CompilerUnitTests
             ProgramNode program = parser.Parse();
 
             var declr = new ProcedureDeclarationStmt(0, 0);
-            declr.Identifier = new IdentifierExpr(0, 0, "proc");
+            declr.Identifier = "proc";
             declr.Parameters = new ParameterList(0, 0);
-            declr.Parameters.AddParameter(new IdentifierExpr(0, 0, "par1"), new SimpleType(0, 0, ExprType.Real), false);
+            declr.Parameters.AddParameter("par1", new SimpleType(0, 0, ExprType.Real), false);
             declr.ProcedureBlock = new BlockStmt(0, 0);
             var call = new CallStmt(0, 0);
-            call.ProcedureId = new IdentifierExpr(0, 0, "writeln");
+            call.ProcedureId = "writeln";
             declr.ProcedureBlock.Statements.Add(call);
             expected.Block.Statements.Add(declr);
 
@@ -156,10 +156,10 @@ namespace CompilerUnitTests
             ProgramNode program = parser.Parse();
 
             var declr = new ProcedureDeclarationStmt(0, 0);
-            declr.Identifier = new IdentifierExpr(0, 0, "proc");
+            declr.Identifier = "proc";
             declr.ProcedureBlock = new BlockStmt(0, 0);
             var call = new CallStmt(0, 0);
-            call.ProcedureId = new IdentifierExpr(0, 0, "writeln");
+            call.ProcedureId = "writeln";
             declr.ProcedureBlock.Statements.Add(call);
             expected.Block.Statements.Add(declr);
 
@@ -187,9 +187,9 @@ namespace CompilerUnitTests
             ProgramNode program = parser.Parse();
 
             var declr = new ProcedureDeclarationStmt(0, 0);
-            declr.Identifier = new IdentifierExpr(0, 0, "proc");
+            declr.Identifier = "proc";
             declr.Parameters = new ParameterList(0, 0);
-            declr.Parameters.AddParameter(new IdentifierExpr(0, 0, "par1"), new SimpleType(0, 0, ExprType.Real), false);
+            declr.Parameters.AddParameter("par1", new SimpleType(0, 0, ExprType.Real), false);
             declr.ProcedureBlock = new BlockStmt(0, 0);
             declr.ProcedureBlock.Statements.Add(new ReturnStmt(0, 0));
             expected.Block.Statements.Add(declr);
@@ -225,13 +225,13 @@ namespace CompilerUnitTests
             ProgramNode program = parser.Parse();
 
             var declr = new ProcedureDeclarationStmt(0, 0);
-            declr.Identifier = new IdentifierExpr(0, 0, "proc");
+            declr.Identifier = "proc";
             declr.Parameters = new ParameterList(0, 0);
-            declr.Parameters.AddParameter(new IdentifierExpr(0, 0, "par1"), new SimpleType(0, 0, ExprType.Real), false);
-            declr.Parameters.AddParameter(new IdentifierExpr(0, 0, "par2"), new SimpleType(0, 0, ExprType.String), true);
+            declr.Parameters.AddParameter("par1", new SimpleType(0, 0, ExprType.Real), false);
+            declr.Parameters.AddParameter("par2", new SimpleType(0, 0, ExprType.String), true);
             declr.ProcedureBlock = new BlockStmt(0, 0);
             var call = new CallStmt(0, 0);
-            call.ProcedureId = new IdentifierExpr(0, 0, "writeln");
+            call.ProcedureId = "writeln";
             declr.ProcedureBlock.Statements.Add(call);
             expected.Block.Statements.Add(declr);
 
@@ -262,10 +262,10 @@ namespace CompilerUnitTests
             ProgramNode program = parser.Parse();
 
             var declr = new FunctionDeclarationStmt(0, 0);
-            declr.Identifier = new IdentifierExpr(0, 0, "func");
+            declr.Identifier = "func";
             declr.ReturnType = new SimpleType(0, 0, ExprType.Bool);
             declr.Parameters = new ParameterList(0, 0);
-            declr.Parameters.AddParameter(new IdentifierExpr(0, 0, "par1"), new SimpleType(0, 0, ExprType.Int), false);
+            declr.Parameters.AddParameter("par1", new SimpleType(0, 0, ExprType.Int), false);
             declr.ProcedureBlock = new BlockStmt(0, 0);
             var returnStmt = new ReturnStmt(0, 0);
             returnStmt.ReturnExpression = new IntLiteralExpr(0, 0, 123);
@@ -288,7 +288,7 @@ namespace CompilerUnitTests
             ProgramNode program = parser.Parse();
 
             var assign = new AssignmentStmt(0, 0);
-            assign.Identifier = new IdentifierExpr(0, 0, "var1");
+            assign.Variable = new VariableExpr(0, 0, "var1");
             assign.AssignmentExpr = new IntLiteralExpr(0, 0, 1);
             expected.Block.Statements.Add(assign);
 
@@ -312,9 +312,9 @@ namespace CompilerUnitTests
 
             var assign = new AssignmentStmt(0, 0);
             var identifier = new ArrayVariableExpr(0, 0);
-            identifier.ArrayIdentifier = new IdentifierExpr(0, 0, "var1");
+            identifier.ArrayIdentifier = "var1";
             identifier.SubscriptExpr = new IntLiteralExpr(0, 0, 5);
-            assign.Identifier = identifier;
+            assign.Variable = identifier;
             assign.AssignmentExpr = new StringLiteralExpr(0, 0, "moi");
             expected.Block.Statements.Add(assign);
 
@@ -334,7 +334,7 @@ namespace CompilerUnitTests
             ProgramNode program = parser.Parse();
 
             var call = new CallStmt(0, 0);
-            call.ProcedureId = new IdentifierExpr(0, 0, "func");
+            call.ProcedureId = "func";
             expected.Block.Statements.Add(call);
             program.ShouldBeEquivalentTo(expected);
         }
@@ -355,7 +355,7 @@ namespace CompilerUnitTests
             var call = new CallStmt(0, 0);
             call.Arguments = new ArgumentList(0, 0);
             call.Arguments.Arguments.Add(new IntLiteralExpr(0, 0, 2));
-            call.ProcedureId = new IdentifierExpr(0, 0, "func");
+            call.ProcedureId = "func";
             expected.Block.Statements.Add(call);
             program.ShouldBeEquivalentTo(expected);
         }
@@ -379,7 +379,7 @@ namespace CompilerUnitTests
             call.Arguments = new ArgumentList(0, 0);
             call.Arguments.Arguments.Add(new IntLiteralExpr(0, 0, 2));
             call.Arguments.Arguments.Add(new StringLiteralExpr(0, 0, "arg"));
-            call.ProcedureId = new IdentifierExpr(0, 0, "func");
+            call.ProcedureId = "func";
             expected.Block.Statements.Add(call);
             program.ShouldBeEquivalentTo(expected);
         }
@@ -398,7 +398,7 @@ namespace CompilerUnitTests
             ProgramNode program = parser.Parse();
 
             var assert = new AssertStmt(0, 0);
-            assert.AssertExpr = new IdentifierExpr(0, 0, "true");
+            assert.AssertExpr = new VariableExpr(0, 0, "true");
             expected.Block.Statements.Add(assert);
             program.ShouldBeEquivalentTo(expected);
         }
@@ -417,7 +417,7 @@ namespace CompilerUnitTests
             ProgramNode program = parser.Parse();
 
             var ifStmt = new IfStmt(0, 0);
-            ifStmt.TestExpr = new IdentifierExpr(0, 0, "true");
+            ifStmt.TestExpr = new VariableExpr(0, 0, "true");
             ifStmt.TrueStatement = new ReturnStmt(0, 0);
             expected.Block.Statements.Add(ifStmt);
             program.ShouldBeEquivalentTo(expected);
@@ -441,10 +441,10 @@ namespace CompilerUnitTests
             ProgramNode program = parser.Parse();
 
             var ifStmt = new IfStmt(0, 0);
-            ifStmt.TestExpr = new IdentifierExpr(0, 0, "true");
+            ifStmt.TestExpr = new VariableExpr(0, 0, "true");
             ifStmt.TrueStatement = new ReturnStmt(0, 0);
             var call = new CallStmt(0, 0);
-            call.ProcedureId = new IdentifierExpr(0, 0, "writeln");
+            call.ProcedureId = "writeln";
             ifStmt.FalseStatement = call;
             expected.Block.Statements.Add(ifStmt);
             program.ShouldBeEquivalentTo(expected);
@@ -464,7 +464,7 @@ namespace CompilerUnitTests
             ProgramNode program = parser.Parse();
 
             var whileStmt = new WhileStmt(0, 0);
-            whileStmt.TestExpr = new IdentifierExpr(0, 0, "true");
+            whileStmt.TestExpr = new VariableExpr(0, 0, "true");
             whileStmt.Body = new ReturnStmt(0, 0);
             expected.Block.Statements.Add(whileStmt);
             program.ShouldBeEquivalentTo(expected);
@@ -486,7 +486,7 @@ namespace CompilerUnitTests
             var expr = new IntLiteralExpr(0, 0, 5);
             expr.Sign = ExprSign.Minus;
             var assignment = new AssignmentStmt(0, 0);
-            assignment.Identifier = new IdentifierExpr(0, 0, "x");
+            assignment.Variable = new VariableExpr(0, 0, "x");
             assignment.AssignmentExpr = expr;
             expected.Block.Statements.Add(assignment);
             program.ShouldBeEquivalentTo(expected);
@@ -507,7 +507,7 @@ namespace CompilerUnitTests
             var expr = new IntLiteralExpr(0, 0, 5);
             expr.Sign = ExprSign.Minus;
             var assignment = new AssignmentStmt(0, 0);
-            assignment.Identifier = new IdentifierExpr(0, 0, "x");
+            assignment.Variable = new VariableExpr(0, 0, "x");
             assignment.AssignmentExpr = new RealLiteralExpr(0, 0, 2400);
             expected.Block.Statements.Add(assignment);
             program.ShouldBeEquivalentTo(expected);
@@ -540,7 +540,7 @@ namespace CompilerUnitTests
             expr2.Op = Operator.Minus;
             var assignment = new AssignmentStmt(0, 0);
             assignment.AssignmentExpr = expr2;
-            assignment.Identifier = new IdentifierExpr(0, 0, "x");
+            assignment.Variable = new VariableExpr(0, 0, "x");
             expected.Block.Statements.Add(assignment);
             program.ShouldBeEquivalentTo(expected);
         }
@@ -572,7 +572,7 @@ namespace CompilerUnitTests
             expr2.Op = Operator.Divide;
             var assignment = new AssignmentStmt(0, 0);
             assignment.AssignmentExpr = expr2;
-            assignment.Identifier = new IdentifierExpr(0, 0, "x");
+            assignment.Variable = new VariableExpr(0, 0, "x");
             expected.Block.Statements.Add(assignment);
             program.ShouldBeEquivalentTo(expected);
         }
@@ -604,7 +604,7 @@ namespace CompilerUnitTests
             expr2.Op = Operator.Plus;
             var assignment = new AssignmentStmt(0, 0);
             assignment.AssignmentExpr = expr2;
-            assignment.Identifier = new IdentifierExpr(0, 0, "x");
+            assignment.Variable = new VariableExpr(0, 0, "x");
             expected.Block.Statements.Add(assignment);
             program.ShouldBeEquivalentTo(expected);
         }
@@ -638,7 +638,7 @@ namespace CompilerUnitTests
             expr2.Op = Operator.Times;
             var assignment = new AssignmentStmt(0, 0);
             assignment.AssignmentExpr = expr2;
-            assignment.Identifier = new IdentifierExpr(0, 0, "x");
+            assignment.Variable = new VariableExpr(0, 0, "x");
             expected.Block.Statements.Add(assignment);
             program.ShouldBeEquivalentTo(expected);
         }
@@ -676,7 +676,7 @@ namespace CompilerUnitTests
             comp.Op = Operator.Less;
             var assignment = new AssignmentStmt(0, 0);
             assignment.AssignmentExpr = comp;
-            assignment.Identifier = new IdentifierExpr(0, 0, "x");
+            assignment.Variable = new VariableExpr(0, 0, "x");
             expected.Block.Statements.Add(assignment);
             program.ShouldBeEquivalentTo(expected);
         }
@@ -700,10 +700,10 @@ namespace CompilerUnitTests
             var call = new CallExpr(0, 0);
             call.Arguments = new ArgumentList(0, 0);
             call.Arguments.Arguments.Add(new StringLiteralExpr(0, 0, "asd"));
-            call.ProcedureId = new IdentifierExpr(0, 0, "func");
+            call.CalleeId = "func";
             var assignment = new AssignmentStmt(0, 0);
             assignment.AssignmentExpr = call;
-            assignment.Identifier = new IdentifierExpr(0, 0, "x");
+            assignment.Variable = new VariableExpr(0, 0, "x");
             expected.Block.Statements.Add(assignment);
             program.ShouldBeEquivalentTo(expected);
         }
@@ -735,7 +735,7 @@ namespace CompilerUnitTests
             unary.Expr = comp;
             var assignment = new AssignmentStmt(0, 0);
             assignment.AssignmentExpr = unary;
-            assignment.Identifier = new IdentifierExpr(0, 0, "x");
+            assignment.Variable = new VariableExpr(0, 0, "x");
             expected.Block.Statements.Add(assignment);
             program.ShouldBeEquivalentTo(expected);
         }
@@ -756,11 +756,11 @@ namespace CompilerUnitTests
             ProgramNode program = parser.Parse();
 
             var expr = new MemberAccessExpr(0, 0);
-            expr.AccessedExpr = new IdentifierExpr(0, 0, "arr");
-            expr.MemberId = new IdentifierExpr(0, 0, "size");
+            expr.AccessedExpr = new VariableExpr(0, 0, "arr");
+            expr.MemberId = "size";
             var assignment = new AssignmentStmt(0, 0);
             assignment.AssignmentExpr = expr;
-            assignment.Identifier = new IdentifierExpr(0, 0, "x");
+            assignment.Variable = new VariableExpr(0, 0, "x");
             expected.Block.Statements.Add(assignment);
             program.ShouldBeEquivalentTo(expected);
         }
@@ -782,9 +782,9 @@ namespace CompilerUnitTests
             ProgramNode program = parser.Parse();
 
             var assert = new AssertStmt(0, 0);
-            assert.AssertExpr = new IdentifierExpr(0, 0, "true");
+            assert.AssertExpr = new VariableExpr(0, 0, "true");
             var call = new CallStmt(0, 0);
-            call.ProcedureId = new IdentifierExpr(0, 0, "writeln");
+            call.ProcedureId = "writeln";
             expected.Block.Statements.Add(assert);
             expected.Block.Statements.Add(call);
             program.ShouldBeEquivalentTo(expected);

@@ -74,7 +74,7 @@ namespace MiniPascalCompiler
 
     public class ProgramNode : AstNode
     {
-        public IdentifierExpr Identifier { get; set; }
+        public string Identifier { get; set; }
         public BlockStmt Block { get; set; }
 
         public ProgramNode(int line, int column) : base(line, column) { }
@@ -117,11 +117,11 @@ namespace MiniPascalCompiler
     {
         public struct Parameter
         {
-            public readonly IdentifierExpr Identifier;
+            public readonly string Identifier;
             public readonly TypeNode Type;
             public readonly bool ReferenceParameter;
 
-            public Parameter(IdentifierExpr identifier, TypeNode type, bool referenceParameter)
+            public Parameter(string identifier, TypeNode type, bool referenceParameter)
             {
                 Identifier = identifier;
                 Type = type;
@@ -134,7 +134,7 @@ namespace MiniPascalCompiler
         public ParameterList(int line, int column) : base(line, column) { }
         public ParameterList(Token token) : base(token) { }
 
-        public void AddParameter(IdentifierExpr identifier, TypeNode type, bool referenceParameter)
+        public void AddParameter(string identifier, TypeNode type, bool referenceParameter)
         {
             Parameters.Add(new Parameter(identifier, type, referenceParameter));
         }
@@ -150,7 +150,7 @@ namespace MiniPascalCompiler
 
     public class VarDeclarationStmt : Statement
     {
-        public List<IdentifierExpr> Identifiers { get; set; } = new List<IdentifierExpr>();
+        public List<string> Identifiers { get; set; } = new List<string>();
         public TypeNode Type { get; set; }
 
         public VarDeclarationStmt(int line, int column) : base(line, column) { }
@@ -159,7 +159,7 @@ namespace MiniPascalCompiler
 
     public class ProcedureDeclarationStmt : Statement
     {
-        public IdentifierExpr Identifier { get; set; }
+        public string Identifier { get; set; }
         public BlockStmt ProcedureBlock { get; set; }
         public ParameterList Parameters { get; set; }
 
@@ -169,7 +169,7 @@ namespace MiniPascalCompiler
 
     public class FunctionDeclarationStmt : Statement
     {
-        public IdentifierExpr Identifier { get; set; }
+        public string Identifier { get; set; }
         public BlockStmt ProcedureBlock { get; set; }
         public ParameterList Parameters { get; set; }
         public TypeNode ReturnType { get; set; }
@@ -178,23 +178,23 @@ namespace MiniPascalCompiler
         public FunctionDeclarationStmt(Token token) : base(token) { }
     }
 
-    public class IdentifierExpr : Expression, IVariableExpr
+    public class VariableExpr : Expression, IVariableExpr
     {
-        public string IdentifierName { get; set; }
+        public string Identifier { get; set; }
 
-        public IdentifierExpr(int line, int column, string identifierName) : base(line, column)
+        public VariableExpr(int line, int column, string identifierName) : base(line, column)
         {
-            IdentifierName = identifierName;
+            Identifier = identifierName;
         }
-        public IdentifierExpr(Token token) : base(token)
+        public VariableExpr(Token token) : base(token)
         {
-            IdentifierName = token.Content;
+            Identifier = token.Content;
         }
     }
 
     public class AssignmentStmt : SimpleStmt
     {
-        public IVariableExpr Identifier { get; set; }
+        public IVariableExpr Variable { get; set; }
         public Expression AssignmentExpr { get; set; }
 
         public AssignmentStmt(int line, int column) : base(line, column) { }
@@ -222,7 +222,7 @@ namespace MiniPascalCompiler
 
     public class CallStmt : SimpleStmt
     {
-        public IdentifierExpr ProcedureId { get; set; }
+        public string ProcedureId { get; set; }
         public ArgumentList Arguments { get; set; }
 
         public CallStmt(int line, int column) : base(line, column) { }
@@ -327,7 +327,7 @@ namespace MiniPascalCompiler
 
     public class CallExpr : Expression
     {
-        public IdentifierExpr ProcedureId { get; set; }
+        public string CalleeId { get; set; }
         public ArgumentList Arguments { get; set; }
 
         public CallExpr(int line, int column) : base(line, column) { }
@@ -337,7 +337,7 @@ namespace MiniPascalCompiler
     public class MemberAccessExpr : Expression
     {
         public Expression AccessedExpr { get; set; }
-        public IdentifierExpr MemberId { get; set; }
+        public string MemberId { get; set; }
 
         public MemberAccessExpr(int line, int column) : base(line, column) { }
         public MemberAccessExpr(Token token) : base(token) { }
@@ -346,7 +346,7 @@ namespace MiniPascalCompiler
     public class ArrayVariableExpr : Expression, IVariableExpr
     {
         public Expression SubscriptExpr { get; set; }
-        public IdentifierExpr ArrayIdentifier { get; set; }
+        public string ArrayIdentifier { get; set; }
 
         public ArrayVariableExpr(int line, int column) : base(line, column) { }
         public ArrayVariableExpr(Token token) : base(token) { }
