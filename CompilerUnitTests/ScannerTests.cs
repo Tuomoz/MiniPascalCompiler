@@ -471,7 +471,7 @@ namespace CompilerUnitTests
             Scanner lexer = CreateStringLexer("\"asd \\a\"");
             lexer.GetNextToken();
             string errorMessage = Errors.GetErrors()[0].ToString();
-            Assert.That(errorMessage, Is.EqualTo("LexicalError: Unrecognized escape sequence '\\a' at line 1 column 7"));
+            Assert.That(errorMessage, Is.EqualTo("(1,7) LexicalError: Unrecognized escape sequence '\\a'"));
         }
 
         [Test]
@@ -480,7 +480,7 @@ namespace CompilerUnitTests
             Scanner lexer = CreateStringLexer("\"asd\n");
             lexer.GetNextToken();
             string errorMessage = Errors.GetErrors()[0].ToString();
-            Assert.That(errorMessage, Is.EqualTo("LexicalError: EOL while scanning string literal at line 1 column 5"));
+            Assert.That(errorMessage, Is.EqualTo("(1,5) LexicalError: EOL while scanning string literal"));
         }
 
         [Test]
@@ -489,7 +489,7 @@ namespace CompilerUnitTests
             Scanner lexer = CreateStringLexer("\"");
             lexer.GetNextToken();
             string errorMessage = Errors.GetErrors()[0].ToString();
-            Assert.That(errorMessage, Is.EqualTo("LexicalError: EOL while scanning string literal at line 1 column 1"));
+            Assert.That(errorMessage, Is.EqualTo("(1,1) LexicalError: EOL while scanning string literal"));
         }
 
         [Test]
@@ -498,7 +498,7 @@ namespace CompilerUnitTests
             Scanner lexer = CreateStringLexer("@");
             lexer.GetNextToken();
             string errorMessage = Errors.GetErrors()[0].ToString();
-            Assert.That(errorMessage, Is.EqualTo("LexicalError: Unknown token '@' at line 1 column 1"));
+            Assert.That(errorMessage, Is.EqualTo("(1,1) LexicalError: Unknown token '@'"));
         }
 
         [Test]
@@ -507,7 +507,7 @@ namespace CompilerUnitTests
             Scanner lexer = CreateStringLexer("@var");
             Token token = lexer.GetNextToken();
             string errorMessage = Errors.GetErrors()[0].ToString();
-            Assert.That(errorMessage, Is.EqualTo("LexicalError: Unknown token '@' at line 1 column 1"));
+            Assert.That(errorMessage, Is.EqualTo("(1,1) LexicalError: Unknown token '@'"));
             Assert.That(token.Type, Is.EqualTo(TokenType.KwVar));
         }
 
@@ -517,7 +517,7 @@ namespace CompilerUnitTests
             Scanner lexer = CreateStringLexer("1.2e");
             Token token = lexer.GetNextToken();
             string errorMessage = Errors.GetErrors()[0].ToString();
-            Assert.That(errorMessage, Is.EqualTo("LexicalError: Expected digits while reading exponent at line 1 column 4"));
+            Assert.That(errorMessage, Is.EqualTo("(1,4) LexicalError: Expected digits while reading exponent"));
             Assert.That(token.Content, Is.EqualTo("1.2"));
         }
 
@@ -527,7 +527,7 @@ namespace CompilerUnitTests
             Scanner lexer = CreateStringLexer("15.02e-");
             Token token = lexer.GetNextToken();
             string errorMessage = Errors.GetErrors()[0].ToString();
-            Assert.That(errorMessage, Is.EqualTo("LexicalError: Expected digits while reading exponent at line 1 column 7"));
+            Assert.That(errorMessage, Is.EqualTo("(1,7) LexicalError: Expected digits while reading exponent"));
             Assert.That(token.Content, Is.EqualTo("15.02"));
         }
 
@@ -632,13 +632,13 @@ namespace CompilerUnitTests
         }
 
         [Test]
-        public void Scanner_WithUnclosedMultilineComment_ThrowsException()
+        public void Scanner_WithUnclosedMultilineComment_CreatesError()
         {
             Scanner lexer = CreateStringLexer("var/*int\nstring");
             Assert.That(lexer.GetNextToken().Type, Is.EqualTo(TokenType.KwVar));
             lexer.GetNextToken();
             string errorMessage = Errors.GetErrors()[0].ToString();
-            Assert.That(errorMessage, Is.EqualTo("LexicalError: EOF while scanning comment beginning at line 1 column 4"));
+            Assert.That(errorMessage, Is.EqualTo("(1,4) LexicalError: EOF while scanning comment"));
         }
 
         [Test]

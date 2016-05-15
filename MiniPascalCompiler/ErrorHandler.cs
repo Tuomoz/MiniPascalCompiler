@@ -18,9 +18,9 @@ namespace MiniPascalCompiler
         {
         }
 
-        public void AddError(string errorMessage, ErrorType errorType)
+        public void AddError(string errorMessage, ErrorType errorType, int line, int column)
         {
-            Errors.Enqueue(new Error(errorMessage, errorType));
+            Errors.Enqueue(new Error(errorMessage, errorType, line, column));
         }
 
         public Error[] GetErrors()
@@ -33,16 +33,19 @@ namespace MiniPascalCompiler
     {
         public readonly ErrorType ErrorType;
         public readonly string ErrorMessage;
+        public readonly int Line, Column;
 
-        public Error(string errorMessage, ErrorType errorType)
+        public Error(string errorMessage, ErrorType errorType, int line, int column)
         {
             ErrorMessage = errorMessage;
             ErrorType = errorType;
+            Line = line;
+            Column = column;
         }
 
         public override string ToString()
         {
-            return string.Format("{0}: {1}", ErrorType, ErrorMessage);
+            return string.Format("({0},{1}) {2}: {3}", Line, Column, ErrorType, ErrorMessage);
         }
     }
 }

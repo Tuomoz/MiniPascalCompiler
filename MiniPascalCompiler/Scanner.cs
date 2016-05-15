@@ -124,10 +124,7 @@ namespace MiniPascalCompiler
             }
             else
             {
-                ErrorHandler.AddError(
-                    string.Format("Unknown token '{0}' at line {1} column {2}",
-                    Source.CurrentChar, Source.CurrentLine, Source.CurrentColumn),
-                    ErrorType.LexicalError);
+                AddError(string.Format("Unknown token '{0}'", Source.CurrentChar));
                 return GetNextToken();
             }
         }
@@ -157,9 +154,7 @@ namespace MiniPascalCompiler
                     }
                     else
                     {
-                        ErrorHandler.AddError(
-                            String.Format("Expected digits while reading exponent at line {0} column {1}",
-                            Source.CurrentLine, Source.CurrentColumn), ErrorType.LexicalError);
+                        AddError("Expected digits while reading exponent");
                     }
                 }
                 return tokenContent.ToString();
@@ -186,10 +181,7 @@ namespace MiniPascalCompiler
                     }
                     catch (KeyNotFoundException)
                     {
-                        ErrorHandler.AddError(
-                            string.Format("Unrecognized escape sequence '\\{0}' at line {1} column {2}",
-                            Source.CurrentChar, Source.CurrentLine, Source.CurrentColumn),
-                            ErrorType.LexicalError);
+                        AddError(string.Format("Unrecognized escape sequence '\\{0}'", Source.CurrentChar));
                     }
                 }
                 else
@@ -204,10 +196,7 @@ namespace MiniPascalCompiler
             else
             {
                 Source.ReadNext();
-                ErrorHandler.AddError(
-                    string.Format("EOL while scanning string literal at line {0} column {1}",
-                    Source.CurrentLine, Source.CurrentColumn),
-                    ErrorType.LexicalError);
+                AddError("EOL while scanning string literal");
             }
             return TokenContentBuilder.ToString();
         }
@@ -250,14 +239,21 @@ namespace MiniPascalCompiler
                     Source.ReadNext();
                     if (commentDepth > 0)
                     {
-                        ErrorHandler.AddError(
-                            string.Format("EOF while scanning comment beginning at line {0} column {1}",
-                            commentBeginLine, commentBeginColumn),
-                            ErrorType.LexicalError);
+                        AddError("EOF while scanning comment", commentBeginLine, commentBeginColumn);
                     }
                 }
                 SkipWhitespace();
             }
+        }
+
+        private void AddError(string message)
+        {
+            ErrorHandler.AddError(message, ErrorType.LexicalError, Source.CurrentLine, Source.CurrentColumn);
+        }
+
+        private void AddError(string message, int line, int column)
+        {
+            ErrorHandler.AddError(message, ErrorType.LexicalError, line, column);
         }
     }
 
