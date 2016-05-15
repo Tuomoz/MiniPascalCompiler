@@ -6,37 +6,32 @@ namespace MiniPascalCompiler
 
     public class SymbolTable
     {
-        private int NewScopeId = 0;
-        private int CurrentScope { get { return ScopeStack.Peek(); } }
+        private int ScopeCounter = 0;
+        public int CurrentScope { get { return ScopeStack.Peek(); } }
         private Stack<int> ScopeStack = new Stack<int>();
         private Dictionary<string, List<Symbol>> Symbols = new Dictionary<string, List<Symbol>>();
-        //{
-        //    { "true", new Symbol("true", ExprType.Bool, SymbolType.Variable, 0) },
-        //    { "false", new Symbol("false", ExprType.Bool, SymbolType.Variable, 0) },
-        //    { "read", new Symbol("read", ExprType.Void, SymbolType.Procedure, 0) },
-        //    { "writeln", new Symbol("writeln", ExprType.Void, SymbolType.Procedure, 0) }
-        //};
 
         public SymbolTable()
         {
-            AddSymbol("true", ExprType.Bool, SymbolType.Variable);
-            AddSymbol("false", ExprType.Bool, SymbolType.Variable);
-            AddSymbol("writeln", ExprType.Void, SymbolType.Procedure);
-            AddSymbol("read", ExprType.Void, SymbolType.Procedure);
+            ScopeStack.Push(0);
+            AddSymbol(new VariableSymbol("true", ExprType.Bool, false, 0));
+            AddSymbol(new VariableSymbol("false", ExprType.Bool, false, 0));
+            AddSymbol(new ProcedureSymbol("writeln", 0));
+            AddSymbol(new ProcedureSymbol("read", 0));
         }
 
-        public bool AddSymbol(string name, ExprType exprType, SymbolType symbolType)
+        public bool AddSymbol(Symbol symbol)
         {
             List<Symbol> symbolList;
-            if (Symbols.TryGetValue(name, out symbolList))
+            if (Symbols.TryGetValue(symbol.Name, out symbolList))
             {
-                if (symbolList.Exists(symbol => symbol.Scope == CurrentScope))
+                if (symbolList.Exists(listSymbol => listSymbol.Scope == CurrentScope))
                 {
                     return false;
                 }
-                symbolList.Add(new Symbol(name, exprType, symbolType, CurrentScope));
+                symbolList.Add(symbol);
             }
-            Symbols[name] = new List<Symbol>() { new Symbol(name, exprType, symbolType, CurrentScope) };
+            Symbols[symbol.Name] = new List<Symbol>() { symbol };
             return true;
         }
 
@@ -82,29 +77,13 @@ namespace MiniPascalCompiler
 
         public void EnterScope()
         {
-            NewScopeId++;
-            ScopeStack.Push(NewScopeId);
+            ScopeCounter++;
+            ScopeStack.Push(ScopeCounter);
         }
 
         public void LeaveScope()
         {
             ScopeStack.Pop();
-        }
-    }
-
-    public class Symbol
-    {
-        public readonly string Name;
-        public readonly ExprType EvalType;
-        public readonly SymbolType SymbolType;
-        public readonly int Scope;
-
-        public Symbol(string name, ExprType evalType, SymbolType symbolType, int scope)
-        {
-            Name = name;
-            EvalType = evalType;
-            SymbolType = symbolType;
-            Scope = scope;
         }
     }
 }
