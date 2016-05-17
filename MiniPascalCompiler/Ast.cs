@@ -54,17 +54,13 @@ namespace MiniPascalCompiler
     {
         public string Identifier { get; set; }
         public BlockStmt ProcedureBlock { get; set; }
-        public List<Parameter> Parameters;
+        public List<Parameter> Parameters = new List<Parameter>();
 
         public CallableDeclarationStmt(int line, int column) : base(line, column) { }
         public CallableDeclarationStmt(Token token) : base(token) { }
 
         public void AddParameter(string identifier, TypeNode type, bool referenceParameter)
         {
-            if (Parameters == null)
-            {
-                Parameters = new List<Parameter>();
-            }
             Parameters.Add(new Parameter(identifier, type, referenceParameter));
         }
     }
@@ -212,7 +208,7 @@ namespace MiniPascalCompiler
     public class CallStmt : SimpleStmt
     {
         public string ProcedureId { get; set; }
-        public List<Expression> Arguments { get; set; }
+        public List<Expression> Arguments { get; set; } = new List<Expression>();
 
         public CallStmt(int line, int column) : base(line, column) { }
         public CallStmt(Token token) : base(token) { }

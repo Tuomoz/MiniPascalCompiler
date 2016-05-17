@@ -121,12 +121,12 @@ namespace MiniPascalCompiler
 
         private List<Parameter> ParseParameters()
         {
+            var parameters = new List<Parameter>();
             if (CurrentToken.Type == TokenType.RParen) // No parameters
             {
-                return null;
+                return parameters;
             }
 
-            var parameters = new List<Parameter>();
             do
             {
                 bool referenceParameter = Accept(TokenType.KwVar);
@@ -284,12 +284,12 @@ namespace MiniPascalCompiler
 
         private List<Expression> ParseArguments()
         {
+            var arguments = new List<Expression>();
             if (CurrentToken.Type == TokenType.RParen) // No arguments
             {
-                return null;
+                return arguments;
             }
 
-            var arguments = new List<Expression>();
             do
             {
                 arguments.Add(ParseExpression());
