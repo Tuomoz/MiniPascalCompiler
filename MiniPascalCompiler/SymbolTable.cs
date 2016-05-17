@@ -14,8 +14,8 @@ namespace MiniPascalCompiler
         public SymbolTable()
         {
             ScopeStack.Push(0);
-            AddSymbol(new VariableSymbol("true", ExprType.Bool, false, 0));
-            AddSymbol(new VariableSymbol("false", ExprType.Bool, false, 0));
+            AddSymbol(new VariableSymbol("true", TypeInfo.BasicBool, 0));
+            AddSymbol(new VariableSymbol("false", TypeInfo.BasicBool, 0));
             AddSymbol(new ProcedureSymbol("writeln", 0));
             AddSymbol(new ProcedureSymbol("read", 0));
         }
@@ -33,6 +33,19 @@ namespace MiniPascalCompiler
             }
             Symbols[symbol.Name] = new List<Symbol>() { symbol };
             return true;
+        }
+
+        public bool ExistsInCurrentScope(string name)
+        {
+            List<Symbol> symbolList;
+            if (Symbols.TryGetValue(name, out symbolList))
+            {
+                if (symbolList.Exists(listSymbol => listSymbol.Scope == CurrentScope))
+                {
+                    return true;
+                }
+            }
+            return false;
         }
 
         public Symbol Lookup(string name)
@@ -75,15 +88,16 @@ namespace MiniPascalCompiler
             return null;
         }
 
-        public void EnterScope()
+        public int EnterScope()
         {
             ScopeCounter++;
             ScopeStack.Push(ScopeCounter);
+            return ScopeCounter;
         }
 
-        public void LeaveScope()
+        public int LeaveScope()
         {
-            ScopeStack.Pop();
+            return ScopeStack.Pop();
         }
     }
 }
