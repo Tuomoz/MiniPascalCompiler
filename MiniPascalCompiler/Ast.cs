@@ -11,7 +11,8 @@ namespace MiniPascalCompiler
     public enum Operator
     {
         Plus, Minus, Times, Divide, Less, Equals, And, Not,
-        Modulus, LessOrEquals, More, MoreOrEquals, NotEquals
+        Modulus, LessOrEquals, More, MoreOrEquals, NotEquals,
+        Or
     }
     public enum ExprSign { Plus, Minus }
 
@@ -255,6 +256,8 @@ namespace MiniPascalCompiler
                 case TokenType.OpEquals: Op = Operator.Equals; break;
                 case TokenType.OpNotEquals: Op = Operator.NotEquals; break;
                 case TokenType.OpAnd: Op = Operator.And; break;
+                case TokenType.OpOr: Op = Operator.Or; break;
+                default: throw new ArgumentException(string.Format("Unknown operator {0}", token.Type));
             }
         }
     }
