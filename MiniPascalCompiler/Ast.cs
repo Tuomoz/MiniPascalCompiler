@@ -316,7 +316,7 @@ namespace MiniPascalCompiler
     public class CallExpr : Expression
     {
         public string CalleeId { get; set; }
-        public List<Expression> Arguments { get; set; }
+        public List<Expression> Arguments { get; set; } = new List<Expression>();
 
         public CallExpr(int line, int column) : base(line, column) { }
         public CallExpr(Token token) : base(token) { }

@@ -117,7 +117,7 @@ namespace MiniPascalCompiler
                 return varType.SameAs(valueType);
             }
 
-            ExprType common = FindCommonType(valueType.BasicType, valueType.BasicType);
+            ExprType common = FindCommonType(varType.BasicType, valueType.BasicType);
             if (common != ExprType.Void)
             {
                 if (varType.BasicType == common)

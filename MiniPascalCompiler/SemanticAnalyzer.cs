@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace MiniPascalCompiler
 {
-    class SemanticAnalyzer
+    public class SemanticAnalyzer
     {
         private ProgramNode Program;
         private ErrorHandler Errors;
@@ -83,11 +83,18 @@ namespace MiniPascalCompiler
                 Visit((dynamic)argument);
                 TypeInfo argumentType = TypeStack.Pop();
                 ParameterSymbol parameter = callable.Parameters[index];
-                if (argumentType.BasicType != ExprType.Void &&
-                    !TypeChecker.TypeCheckAssign(parameter.Type, argumentType))
+                if (IsNotVoid(argumentType))
                 {
-                    AddError(string.Format("'{0}' argument {1} expects a parameter of type {2}, {3} given",
-                        callable.Name, index + 1, parameter.Type, argumentType), callNode);
+                    if (!TypeChecker.TypeCheckAssign(parameter.Type, argumentType))
+                    {
+                        AddError(string.Format("'{0}' argument {1} expects a parameter of type {2}, {3} given",
+                            callable.Name, index + 1, parameter.Type, argumentType), callNode);
+                    }
+                    if (!(argument is VariableExpr) && !(argument is ArrayVariableExpr) && parameter.IsReference)
+                    {
+                        AddError(string.Format("'{0}' argument {1} expects a variable of type {2}",
+                            callable.Name, index + 1, argumentType), callNode);
+                    }
                 }
                 index++;
             }
@@ -123,7 +130,7 @@ namespace MiniPascalCompiler
             TypeInfo testType = TypeStack.Pop();
             if (IsNotVoid(testType) && testType.BasicType != ExprType.Bool)
             {
-                AddError("While condition expression has to be of type Bool", ifStmt);
+                AddError("If test expression has to be of type Bool", ifStmt);
             }
             Visit((dynamic)ifStmt.TrueStatement);
             if (ifStmt.FalseStatement != null)
@@ -155,11 +162,13 @@ namespace MiniPascalCompiler
             if (callSymbol == null)
             {
                 AddError(string.Format("Undeclared function '{0}'", callExpr.CalleeId), callExpr);
+                TypeStack.Push(TypeInfo.BasicVoid);
                 return;
             }
-            if (!(callSymbol is FunctionSymbol) && !(callSymbol is ProcedureSymbol))
+            if (!(callSymbol is FunctionSymbol))
             {
                 AddError(string.Format("'{0}' is not defined as a function", callExpr.CalleeId), callExpr);
+                TypeStack.Push(TypeInfo.BasicVoid);
                 return;
             }
             CheckCallParameters(callExpr, callExpr.Arguments, callSymbol as CallableSymbol);
@@ -173,19 +182,26 @@ namespace MiniPascalCompiler
             {
                 Visit((dynamic)arrayVariableExpr.SubscriptExpr);
                 TypeInfo subscriptType = TypeStack.Pop();
-                if (IsNotVoid(subscriptType) && !subscriptType.SameAs(ExprType.Int))
-                {
-                    AddError("Array subscript expression has to be of type Int", arrayVariableExpr);
-                }
                 if (!symbol.Type.IsArray)
                 {
                     AddError(string.Format("Variable '{0}' is not declared as an array", arrayVariableExpr.ArrayIdentifier), arrayVariableExpr);
+                    TypeStack.Push(TypeInfo.BasicVoid);
+                }
+                else if (IsNotVoid(subscriptType) && !subscriptType.SameAs(ExprType.Int))
+                {
+                    AddError("Array subscript expression has to be of type Int", arrayVariableExpr);
+                    TypeStack.Push(TypeInfo.BasicVoid);
+                }
+                else
+                {
+                    TypeStack.Push(new TypeInfo(symbol.Type.BasicType));
                 }
                 
             }
             else
             {
                 AddError(string.Format("Undeclared variable '{0}'", arrayVariableExpr.ArrayIdentifier), arrayVariableExpr);
+                TypeStack.Push(TypeInfo.BasicVoid);
             }
         }
 
@@ -232,6 +248,7 @@ namespace MiniPascalCompiler
             else
             {
                 AddError(string.Format("Undeclared variable '{0}'", identifierExpr.Identifier), identifierExpr);
+                TypeStack.Push(TypeInfo.BasicVoid);
             }
         }
 
