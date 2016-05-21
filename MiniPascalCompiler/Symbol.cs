@@ -32,10 +32,14 @@ namespace MiniPascalCompiler
         {
             Parameters = parameters;
         }
-        public CallableSymbol(string identifier, TypeInfo type, int scope) :
+        public CallableSymbol(string identifier, TypeInfo type, bool isReference, bool varargs, int scope) :
             base(identifier, type, scope)
         {
             Parameters = new List<ParameterSymbol>();
+            if (varargs)
+            {
+                Parameters.Add(new ParameterSymbol(identifier, TypeInfo.BasicVoid, isReference, varargs, scope));
+            }
         }
 
         private static TypeInfo GetCallableType(CallableDeclarationStmt declaration)
@@ -56,9 +60,10 @@ namespace MiniPascalCompiler
 
     public class ProcedureSymbol : CallableSymbol
     {
-        public ProcedureSymbol(ProcedureDeclarationStmt declaration, List<ParameterSymbol> parameters, int scope)
-            : base(declaration, parameters, scope) { }
-        public ProcedureSymbol(string name, int scope) : base(name, TypeInfo.BasicVoid, scope) { }
+        public ProcedureSymbol(ProcedureDeclarationStmt declaration, List<ParameterSymbol> parameters, int scope) :
+            base(declaration, parameters, scope) { }
+        public ProcedureSymbol(string name, bool isReference, bool varargs, int scope) :
+            base(name, TypeInfo.BasicVoid, isReference, varargs, scope) { }
     }
 
     public class FunctionSymbol : CallableSymbol
@@ -70,9 +75,17 @@ namespace MiniPascalCompiler
     public class ParameterSymbol : Symbol
     {
         public readonly bool IsReference;
+        public readonly bool Varargs;
+
         public ParameterSymbol(Parameter parameter, int scope) : base(parameter.Identifier, parameter.Type, scope)
         {
             IsReference = parameter.ReferenceParameter;
+            Varargs = false;
+        }
+        public ParameterSymbol(string identifier, TypeInfo type, bool isReference, bool varargs, int scope) : base(identifier, type, scope)
+        {
+            IsReference = isReference;
+            Varargs = varargs;
         }
     }
 

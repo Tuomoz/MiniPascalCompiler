@@ -16,8 +16,8 @@ namespace MiniPascalCompiler
             ScopeStack.Push(0);
             AddSymbol(new VariableSymbol("true", TypeInfo.BasicBool, 0));
             AddSymbol(new VariableSymbol("false", TypeInfo.BasicBool, 0));
-            AddSymbol(new ProcedureSymbol("writeln", 0));
-            AddSymbol(new ProcedureSymbol("read", 0));
+            AddSymbol(new ProcedureSymbol("writeln", false, true, 0));
+            AddSymbol(new ProcedureSymbol("read", true, false, 0));
         }
 
         public bool AddSymbol(Symbol symbol)

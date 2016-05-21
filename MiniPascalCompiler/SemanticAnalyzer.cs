@@ -71,6 +71,11 @@ namespace MiniPascalCompiler
 
         private void CheckCallParameters(AstNode callNode, List<Expression> arguments, CallableSymbol callable)
         {
+            if (callable.Parameters.Count != 0 && callable.Parameters[0].Varargs)
+            {
+                return;
+            }
+
             if (arguments.Count != callable.Parameters.Count)
             {
                 AddError(string.Format("'{0}' takes {1} arguments, {2} given",
