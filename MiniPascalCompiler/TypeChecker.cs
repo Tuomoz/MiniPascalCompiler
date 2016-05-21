@@ -74,12 +74,12 @@ namespace MiniPascalCompiler
             };
         }
 
-        public ExprType FindOpProductionType(TypeInfo type1, TypeInfo type2, Operator op)
+        public TypeInfo FindOpProductionType(TypeInfo type1, TypeInfo type2, Operator op)
         {
             if (type1.BasicType == ExprType.Void || type2.BasicType == ExprType.Void ||
                 type1.IsArray || type2.IsArray)
             {
-                return ExprType.Void;
+                return TypeInfo.BasicVoid;
             }
 
             ExprType common = FindCommonType(type1.BasicType, type2.BasicType);
@@ -88,26 +88,26 @@ namespace MiniPascalCompiler
                 var opBindings = typeBindings[common];
                 if (opBindings.ContainsKey(op))
                 {
-                    return opBindings[op];
+                    return TypeInfo.GetInstance(opBindings[op]);
                 }
             }
-            return ExprType.Void;
+            return TypeInfo.BasicVoid;
 
         }
 
-        public ExprType FindOpProductionType(TypeInfo type, Operator op)
+        public TypeInfo FindOpProductionType(TypeInfo type, Operator op)
         {
             if (type.BasicType == ExprType.Void || type.IsArray)
             {
-                return ExprType.Void;
+                return TypeInfo.BasicVoid;
             }
 
             var opBindings = typeBindings[type.BasicType];
             if (opBindings.ContainsKey(op))
             {
-                return opBindings[op];
+                return TypeInfo.GetInstance(opBindings[op]);
             }
-            return ExprType.Void;
+            return TypeInfo.BasicVoid;
         }
 
         public bool TypeCheckAssign(TypeInfo varType, TypeInfo valueType)

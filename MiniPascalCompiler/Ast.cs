@@ -81,7 +81,7 @@ namespace MiniPascalCompiler
             TokenType.Minus, TokenType.Plus, TokenType.Identifier, TokenType.IntLiteral,
             TokenType.RealLiteral, TokenType.StringLiteral, TokenType.LParen, TokenType.OpNot
         };
-        public ExprType Type { get; set; } = ExprType.Void;
+        public TypeInfo Type { get; set; } = TypeInfo.BasicVoid;
         public ExprSign Sign { get; set; } = ExprSign.Plus;
 
         public Expression(int line, int column) : base(line, column) { }
@@ -278,10 +278,12 @@ namespace MiniPascalCompiler
         public IntLiteralExpr(int line, int column, int value) : base(line, column)
         {
             Value = value;
+            Type = TypeInfo.BasicInt;
         }
         public IntLiteralExpr(Token token) : base(token)
         {
             Value = int.Parse(token.Content);
+            Type = TypeInfo.BasicInt;
         }
     }
 
@@ -292,10 +294,12 @@ namespace MiniPascalCompiler
         public StringLiteralExpr(int line, int column, string value) : base(line, column)
         {
             Value = value;
+            Type = TypeInfo.BasicString;
         }
         public StringLiteralExpr(Token token) : base(token)
         {
             Value = token.Content;
+            Type = TypeInfo.BasicString;
         }
     }
 
@@ -306,10 +310,12 @@ namespace MiniPascalCompiler
         public RealLiteralExpr(int line, int column, float value) : base(line, column)
         {
             Value = value;
+            Type = TypeInfo.BasicReal;
         }
         public RealLiteralExpr(Token token) : base(token)
         {
             Value = float.Parse(token.Content, CultureInfo.InvariantCulture);
+            Type = TypeInfo.BasicReal;
         }
     }
 

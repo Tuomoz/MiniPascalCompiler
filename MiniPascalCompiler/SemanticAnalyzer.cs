@@ -152,12 +152,13 @@ namespace MiniPascalCompiler
             TypeInfo type2 = TypeStack.Pop();
             if (IsNotVoid(type1) && IsNotVoid(type2))
             {
-                ExprType opType = TypeChecker.FindOpProductionType(type1, type2, binaryExpr.Op);
-                if (opType == ExprType.Void)
+                TypeInfo opType = TypeChecker.FindOpProductionType(type1, type2, binaryExpr.Op);
+                if (opType.SameAs(TypeInfo.BasicVoid))
                 {
                     AddError(string.Format("Can't apply operator {0} on types {1} and {2}", binaryExpr.Op, type1, type2), binaryExpr);
                 }
-                TypeStack.Push(new TypeInfo(opType));
+                TypeStack.Push(opType);
+                binaryExpr.Type = opType;
             }
         }
 
@@ -178,6 +179,7 @@ namespace MiniPascalCompiler
             }
             CheckCallParameters(callExpr, callExpr.Arguments, callSymbol as CallableSymbol);
             TypeStack.Push(callSymbol.Type);
+            callExpr.Type = callSymbol.Type;
         }
 
         private void Visit(ArrayVariableExpr arrayVariableExpr)
@@ -199,7 +201,8 @@ namespace MiniPascalCompiler
                 }
                 else
                 {
-                    TypeStack.Push(new TypeInfo(symbol.Type.BasicType));
+                    TypeStack.Push(TypeInfo.GetInstance(symbol.Type.BasicType));
+                    arrayVariableExpr.Type = TypeInfo.GetInstance(symbol.Type.BasicType);
                 }
                 
             }
@@ -224,6 +227,7 @@ namespace MiniPascalCompiler
                 if (accessed.IsArray && memberAccessExpr.MemberId == "size")
                 {
                     TypeStack.Push(TypeInfo.BasicInt);
+                    memberAccessExpr.Type = TypeInfo.BasicInt;
                 }
                 else
                 {
@@ -249,6 +253,7 @@ namespace MiniPascalCompiler
             if (symbol != null)
             {
                 TypeStack.Push(symbol.Type);
+                identifierExpr.Type = symbol.Type;
             }
             else
             {
@@ -263,12 +268,13 @@ namespace MiniPascalCompiler
             TypeInfo type = TypeStack.Pop();
             if (IsNotVoid(type))
             {
-                ExprType opType = TypeChecker.FindOpProductionType(type, unaryExpr.Op);
-                if (opType == ExprType.Void)
+                TypeInfo opType = TypeChecker.FindOpProductionType(type, unaryExpr.Op);
+                if (opType.SameAs(TypeInfo.BasicVoid))
                 {
                     AddError(string.Format("Can't apply operator {0} on type {1}", unaryExpr.Op, type), unaryExpr);
                 }
-                TypeStack.Push(new TypeInfo(opType));
+                TypeStack.Push(opType);
+                unaryExpr.Type = opType;
             }
         }
 

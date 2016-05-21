@@ -112,6 +112,19 @@ namespace MiniPascalCompiler
             IsArray = type is ArrayType;
         }
 
+        public static TypeInfo GetInstance(ExprType type)
+        {
+            switch (type)
+            {
+                case ExprType.Bool: return BasicBool;
+                case ExprType.Int: return BasicInt;
+                case ExprType.Real: return BasicReal;
+                case ExprType.String: return BasicString;
+                case ExprType.Void: return BasicVoid;
+                default: throw new System.ArgumentException("Unknown type " + type);
+            }
+        }
+
         public bool SameAs(TypeInfo comp)
         {
             return BasicType == comp.BasicType && IsArray == comp.IsArray;
