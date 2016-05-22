@@ -16,6 +16,7 @@ namespace MiniPascalCompiler
 
         public CILHelper()
         {
+            Type[] twoStrings = new Type[] { typeof(string), typeof(string) };
             NumberActions = new Dictionary<Operator, Action<ILGenerator>>()
             {
                 { Operator.Plus, il => il.Emit(OpCodes.Add) },
@@ -32,14 +33,51 @@ namespace MiniPascalCompiler
             };
             StringActions = new Dictionary<Operator, Action<ILGenerator>>()
             {
-                { Operator.Plus, il => il.Emit(OpCodes.Call, typeof(string).GetMethod("Concat", new Type[] { typeof(string), typeof(string) })) },
-                { Operator.Equals, il => il.Emit(OpCodes.Call, typeof(string).GetMethod("Equals", new Type[] { typeof(string), typeof(string) })) },
+                { Operator.Plus, il => il.Emit(OpCodes.Call, typeof(string).GetMethod("Concat", twoStrings)) },
+                { Operator.Equals, il => il.Emit(OpCodes.Call, typeof(string).GetMethod("Equals", twoStrings )) },
+                { Operator.NotEquals, il => { il.Emit(OpCodes.Call, typeof(string).GetMethod("Equals", twoStrings)); EmitNot(il); } },
+                { Operator.Less, il =>
+                    {
+                        il.Emit(OpCodes.Call, typeof(string).GetMethod("Compare", twoStrings));
+                        il.Emit(OpCodes.Ldc_I4_0);
+                        il.Emit(OpCodes.Clt);
+                    }
+                },
+                { Operator.LessOrEquals, il =>
+                    {
+                        il.Emit(OpCodes.Call, typeof(string).GetMethod("Compare", twoStrings));
+                        il.Emit(OpCodes.Ldc_I4_0);
+                        il.Emit(OpCodes.Cgt);
+                        EmitNot(il);
+                    }
+                },
+                { Operator.More, il =>
+                    {
+                        il.Emit(OpCodes.Call, typeof(string).GetMethod("Compare", twoStrings));
+                        il.Emit(OpCodes.Ldc_I4_0);
+                        il.Emit(OpCodes.Cgt);
+                    }
+                },
+                { Operator.MoreOrEquals, il =>
+                    {
+                        il.Emit(OpCodes.Call, typeof(string).GetMethod("Compare", twoStrings));
+                        il.Emit(OpCodes.Ldc_I4_0);
+                        il.Emit(OpCodes.Clt);
+                        EmitNot(il);
+                    }
+                },
             };
             BooleanActions = new Dictionary<Operator, Action<ILGenerator>>()
             {
                 { Operator.And, il => il.Emit(OpCodes.And) },
                 { Operator.Or, il => il.Emit(OpCodes.Or) },
                 { Operator.Not, il => EmitNot(il) },
+                { Operator.Equals, il => il.Emit(OpCodes.Ceq) },
+                { Operator.NotEquals, il => { il.Emit(OpCodes.Ceq); EmitNot(il); } },
+                { Operator.Less, il => il.Emit(OpCodes.Clt) },
+                { Operator.LessOrEquals, il => { il.Emit(OpCodes.Cgt); EmitNot(il); } },
+                { Operator.More, il => il.Emit(OpCodes.Cgt) },
+                { Operator.MoreOrEquals, il => { il.Emit(OpCodes.Clt); EmitNot(il); } },
             };
             ExprActions = new Dictionary<ExprType, Dictionary<Operator, Action<ILGenerator>>>()
             {
