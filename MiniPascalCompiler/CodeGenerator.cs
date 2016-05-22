@@ -28,25 +28,13 @@ namespace MiniPascalCompiler
             symbols.ResetScope();
         }
 
-        public void Generate()
+        public AssemblyBuilder Generate()
         {
             Visit(program);
-            
-            //ILGenerator constructorIL = main.GetILGenerator();
-            //var asd = constructorIL.DeclareLocal(typeof(string));
-            //asd.SetLocalSymInfo("asdlol");
-            //constructorIL.Emit(OpCodes.Ldstr, "hello world");
-            //constructorIL.Emit(OpCodes.Stloc_0);
-            //constructorIL.Emit(OpCodes.ldf);
-            //constructorIL.Emit(OpCodes.Call, typeof(Console).GetMethod("WriteLine", new Type[] { typeof(string) }));
-            //constructorIL.Emit(OpCodes.Ret);
             Type t = typeBuilder.CreateType();
             moduleBuilder.CreateGlobalFunctions();
             assemblyBuilder.SetEntryPoint(CurrentMethod);
-            assemblyBuilder.Save("test.exe");
-            MethodInfo info = t.GetMethod("Main");
-            object o1 = Activator.CreateInstance(t);
-            info.Invoke(null, null);
+            return assemblyBuilder;
         }
 
         private void Visit(ProgramNode program)
