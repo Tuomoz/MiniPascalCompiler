@@ -46,12 +46,20 @@ namespace MiniPascalCompiler
         public ProgramNode Parse()
         {
             ProgramNode program = new ProgramNode(CurrentToken);
-            Match(TokenType.KwProgram);
-            program.Identifier = ParseIdentifier();
-            Match(TokenType.LineTerm);
-            program.Block = ParseBlock();
-            Match(TokenType.OpDot);
-            return program;
+            try
+            {
+                Match(TokenType.KwProgram);
+                program.Identifier = ParseIdentifier();
+                Match(TokenType.LineTerm);
+                program.Block = ParseBlock();
+                Match(TokenType.OpDot);
+                return program;
+            }
+            catch (Exception e)
+            {
+                Errors.AddError(e.Message, ErrorType.SyntaxError, CurrentToken.Line, CurrentToken.Column);
+                return program;
+            }
         }
 
         private void NextToken()
