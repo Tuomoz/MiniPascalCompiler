@@ -56,6 +56,7 @@ namespace MiniPascalCompiler
         public string Identifier { get; set; }
         public BlockStmt ProcedureBlock { get; set; }
         public List<Parameter> Parameters = new List<Parameter>();
+        public CallableSymbol DeclarationSymbol;
 
         public CallableDeclarationStmt(int line, int column) : base(line, column) { }
         public CallableDeclarationStmt(Token token) : base(token) { }
@@ -131,6 +132,7 @@ namespace MiniPascalCompiler
         public readonly string Identifier;
         public readonly TypeNode Type;
         public readonly bool ReferenceParameter;
+        //public ParameterSymbol Symbol { get; set; }
 
         public Parameter(string identifier, TypeNode type, bool referenceParameter)
         {
@@ -151,6 +153,7 @@ namespace MiniPascalCompiler
     public class VarDeclarationStmt : Statement
     {
         public List<string> Identifiers { get; set; } = new List<string>();
+        public List<Symbol> VarSymbols { get; set; } = new List<Symbol>();
         public TypeNode Type { get; set; }
 
         public VarDeclarationStmt(int line, int column) : base(line, column) { }
@@ -218,6 +221,7 @@ namespace MiniPascalCompiler
     {
         public string ProcedureId { get; set; }
         public List<Expression> Arguments { get; set; } = new List<Expression>();
+        public CallableSymbol DeclarationSymbol { get; set; }
 
         public CallStmt(int line, int column) : base(line, column) { }
         public CallStmt(Token token) : base(token) { }
@@ -331,6 +335,7 @@ namespace MiniPascalCompiler
     {
         public string CalleeId { get; set; }
         public List<Expression> Arguments { get; set; } = new List<Expression>();
+        public FunctionSymbol DeclarationSymbol { get; set; }
 
         public CallExpr(int line, int column) : base(line, column) { }
         public CallExpr(Token token) : base(token) { }

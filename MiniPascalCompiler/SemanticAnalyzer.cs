@@ -47,6 +47,7 @@ namespace MiniPascalCompiler
                 var procSymbol = new ProcedureSymbol(declarationStmt, parameterSymbols, currentScope);
                 Symbols.AddSymbol(procSymbol);
                 FunctionStack.Push(procSymbol);
+                declarationStmt.DeclarationSymbol = procSymbol;
                 Visit(declarationStmt.ProcedureBlock);
                 Symbols.LeaveScope();
                 //ReturnTypeStack.Pop();
@@ -72,6 +73,7 @@ namespace MiniPascalCompiler
                 AddError(string.Format("'{0}' is not defined as a function or a procedure", callStmt.ProcedureId), callStmt);
                 return;
             }
+            callStmt.DeclarationSymbol = callSymbol as CallableSymbol;
             CheckCallParameters(callStmt, callStmt.Arguments, callSymbol as CallableSymbol);
         }
 
@@ -202,6 +204,7 @@ namespace MiniPascalCompiler
             CheckCallParameters(callExpr, callExpr.Arguments, callSymbol as CallableSymbol);
             TypeStack.Push(callSymbol.Type);
             callExpr.Type = callSymbol.Type;
+            callExpr.DeclarationSymbol = callSymbol as FunctionSymbol;
         }
 
         private void Visit(ArrayVariableExpr arrayVariableExpr)
@@ -354,6 +357,7 @@ namespace MiniPascalCompiler
                 var funcSymbol = new FunctionSymbol(declarationStmt, parameterSymbols, currentScope);
                 Symbols.AddSymbol(funcSymbol);
                 FunctionStack.Push(funcSymbol);
+                declarationStmt.DeclarationSymbol = funcSymbol;
                 Visit(declarationStmt.ProcedureBlock);
                 Symbols.LeaveScope();
                 //ReturnTypeStack.Pop();
@@ -369,20 +373,22 @@ namespace MiniPascalCompiler
         {
             foreach (string identifier in varDeclarationStmt.Identifiers)
             {
-                bool created;
+                bool creationSuccess;
+                Symbol createdSymbol;
                 if (Symbols.CurrentScope == 1)
                 {
-                    created = Symbols.AddSymbol(new GlobalSymbol(identifier, varDeclarationStmt.Type, Symbols.CurrentScope));
+                    createdSymbol = new GlobalSymbol(identifier, varDeclarationStmt.Type, Symbols.CurrentScope);
                 }
                 else
                 {
-                    created = Symbols.AddSymbol(new VariableSymbol(identifier, varDeclarationStmt.Type, Symbols.CurrentScope));
+                    createdSymbol = new VariableSymbol(identifier, varDeclarationStmt.Type, Symbols.CurrentScope);
                 }
-                if (!created)
+                creationSuccess = Symbols.AddSymbol(createdSymbol);
+                if (!creationSuccess)
                 {
                     AddError(string.Format("'{0}' is already declared in current scope", identifier), varDeclarationStmt);
                 }
-                
+                varDeclarationStmt.VarSymbols.Add(createdSymbol);
             }
         }
 

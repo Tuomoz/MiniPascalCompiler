@@ -30,6 +30,7 @@ namespace MiniPascalCompiler
     {
         public readonly List<ParameterSymbol> Parameters;
         public List<Symbol> FreeVariables = new List<Symbol>();
+        public MethodBuilder CILMethod;
 
         public CallableSymbol(CallableDeclarationStmt declaration, List<ParameterSymbol> parameters, int scope) :
             base(declaration.Identifier, GetCallableType(declaration), scope)
@@ -88,6 +89,7 @@ namespace MiniPascalCompiler
     {
         public readonly bool IsReference;
         public readonly bool Varargs;
+        public ParameterBuilder CILParameter;
 
         public ParameterSymbol(Parameter parameter, int scope) : base(parameter.Identifier, parameter.Type, scope)
         {
@@ -125,7 +127,6 @@ namespace MiniPascalCompiler
         {
             BasicType = basicType;
             IsArray = isArray;
-            int i = 2;
         }
 
         public TypeInfo(TypeNode type)
