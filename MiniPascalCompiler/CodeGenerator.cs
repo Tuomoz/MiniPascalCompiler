@@ -17,6 +17,7 @@ namespace MiniPascalCompiler
         private ProgramNode program;
         private SymbolTable symbols;
         private CILHelper CILHelper = new CILHelper();
+        private TypeChecker typeChecker = new TypeChecker();
 
         private MethodBuilder CurrentMethod { get { return MethodStack.Peek(); } }
         private ILGenerator CurrentMethodIL { get { return CurrentMethod.GetILGenerator(); } }
@@ -245,15 +246,16 @@ namespace MiniPascalCompiler
         private void Visit(BinaryExpr expr)
         {
             var il = CurrentMethodIL;
+            var commonType = typeChecker.FindCommonType(expr.Left.Type, expr.Right.Type);
             Visit((dynamic)expr.Left);
-            if (expr.Type.SameAs(TypeInfo.BasicReal) && !expr.Type.SameAs(expr.Left.Type))
+            if (!expr.Left.Type.SameAs(commonType))
             {
-                il.Emit(expr.Type.GetCILConvertOp());
+                il.Emit(commonType.GetCILConvertOp());
             }
             Visit((dynamic)expr.Right);
-            if (expr.Type.SameAs(TypeInfo.BasicReal) && !expr.Type.SameAs(expr.Right.Type))
+            if (!expr.Right.Type.SameAs(commonType))
             {
-                il.Emit(expr.Type.GetCILConvertOp());
+                il.Emit(commonType.GetCILConvertOp());
             }
             CILHelper.EmitExprOperation(il, expr.Op, expr.Left.Type);
             ApplyExprSign(expr);

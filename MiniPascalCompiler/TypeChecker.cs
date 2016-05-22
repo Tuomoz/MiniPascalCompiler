@@ -145,5 +145,26 @@ namespace MiniPascalCompiler
                 return ExprType.Void;
             }
         }
+
+        public TypeInfo FindCommonType(TypeInfo type1, TypeInfo type2)
+        {
+            if (type1.SameAs(type2))
+            {
+                return type1;
+            }
+            else if (type1.IsArray || type2.IsArray)
+            {
+                return TypeInfo.BasicVoid;
+            }
+            else if ((type1.BasicType == ExprType.Int && type2.BasicType == ExprType.Real) ||
+                     (type1.BasicType == ExprType.Real && type2.BasicType == ExprType.Int))
+            {
+                return TypeInfo.BasicReal;
+            }
+            else
+            {
+                return TypeInfo.BasicVoid;
+            }
+        }
     }
 }
