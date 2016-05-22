@@ -216,6 +216,10 @@ namespace MiniPascalCompiler
                 {
                     Errors.AddError(e.Message, ErrorType.SyntaxError, CurrentToken.Line, CurrentToken.Column);
                     SkipToNextStatement();
+                    if (CurrentToken.Type == TokenType.EOF)
+                    {
+                        break;
+                    }
                 }
             }
             return block;
