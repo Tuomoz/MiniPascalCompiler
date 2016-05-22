@@ -278,7 +278,7 @@ namespace MiniPascalCompiler
                 return p.Type.CILType;
             }).ToArray();
 
-            var func = typeBuilder.DefineMethod(declaration.Identifier, MethodAttributes.Static, funcSymbol.Type.CILType, paramTypes);
+            var func = typeBuilder.DefineMethod(funcSymbol.ScopedName, MethodAttributes.Static, funcSymbol.Type.CILType, paramTypes);
             declaration.DeclarationSymbol.CILMethod = func;
             MethodStack.Push(func);
             int index = 1;

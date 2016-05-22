@@ -10,7 +10,7 @@ namespace MiniPascalCompiler
     {
         private ProgramNode Program;
         private ErrorHandler Errors;
-        private SymbolTable Symbols = new SymbolTable();
+        private SymbolTable Symbols;
         private Stack<TypeInfo> TypeStack = new Stack<TypeInfo>();
         //private Stack<TypeInfo> ReturnTypeStack = new Stack<TypeInfo>();
         private Stack<CallableSymbol> FunctionStack = new Stack<CallableSymbol>();
@@ -26,6 +26,9 @@ namespace MiniPascalCompiler
 
         public SymbolTable Analyze()
         {
+            Symbols = new SymbolTable();
+            TypeStack.Clear();
+            FunctionStack.Clear();
             Visit(Program);
             return Symbols;
         }
@@ -48,7 +51,7 @@ namespace MiniPascalCompiler
                 Symbols.AddSymbol(procSymbol);
                 FunctionStack.Push(procSymbol);
                 declarationStmt.DeclarationSymbol = procSymbol;
-                Visit(declarationStmt.ProcedureBlock);
+                Visit(declarationStmt.ProcedureBlock, false);
                 Symbols.LeaveScope();
                 //ReturnTypeStack.Pop();
                 FunctionStack.Pop();
@@ -184,6 +187,10 @@ namespace MiniPascalCompiler
                 TypeStack.Push(opType);
                 binaryExpr.Type = opType;
             }
+            else
+            {
+                TypeStack.Push(TypeInfo.BasicVoid);
+            }
         }
 
         private void Visit(CallExpr callExpr)
@@ -279,7 +286,10 @@ namespace MiniPascalCompiler
             if (symbol != null)
             {
                 variableExpr.VariableSymbol = symbol;
-                if (symbol.Scope != Symbols.CurrentScope)
+                var currentFunction = FunctionStack.Peek();
+                if (!currentFunction.Locals.Contains(symbol) && 
+                    !currentFunction.Parameters.Contains(symbol) &&
+                    !currentFunction.FreeVariables.Contains(symbol))
                 {
                     FunctionStack.Peek().FreeVariables.Add(symbol);
                 }
@@ -330,14 +340,16 @@ namespace MiniPascalCompiler
             }
         }
 
-        private void Visit(BlockStmt blockStmt)
+        private void Visit(BlockStmt blockStmt, bool enterScope = true)
         {
-            Symbols.EnterScope();
+            if (enterScope)
+                Symbols.EnterScope();
             foreach (dynamic statement in blockStmt.Statements)
             {
                 Visit(statement);
             }
-            Symbols.LeaveScope();
+            if (enterScope)
+                Symbols.LeaveScope();
         }
 
         private void Visit(FunctionDeclarationStmt declarationStmt) // TODO tarkista että palauttaa oikeasti jotain
@@ -358,7 +370,7 @@ namespace MiniPascalCompiler
                 Symbols.AddSymbol(funcSymbol);
                 FunctionStack.Push(funcSymbol);
                 declarationStmt.DeclarationSymbol = funcSymbol;
-                Visit(declarationStmt.ProcedureBlock);
+                Visit(declarationStmt.ProcedureBlock, false);
                 Symbols.LeaveScope();
                 //ReturnTypeStack.Pop();
                 FunctionStack.Pop();
@@ -382,6 +394,7 @@ namespace MiniPascalCompiler
                 else
                 {
                     createdSymbol = new VariableSymbol(identifier, varDeclarationStmt.Type, Symbols.CurrentScope);
+                    FunctionStack.Peek().Locals.Add(createdSymbol as VariableSymbol);
                 }
                 creationSuccess = Symbols.AddSymbol(createdSymbol);
                 if (!creationSuccess)

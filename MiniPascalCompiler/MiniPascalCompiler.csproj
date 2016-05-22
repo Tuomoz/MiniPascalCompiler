@@ -48,6 +48,7 @@
     <Compile Include="CILHelper.cs" />
     <Compile Include="CodeGenerator.cs" />
     <Compile Include="ErrorHandler.cs" />
+    <Compile Include="LambdaLifter.cs" />
     <Compile Include="Parser.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

@@ -37,8 +37,6 @@ namespace MiniPascalCompiler
             ProgramNode program = parser.Parse();
             SemanticAnalyzer analyzer = new SemanticAnalyzer(program, errors);
             var symbols = analyzer.Analyze();
-            //LambdaLifter lifter = new LambdaLifter(program, symbols);
-            //lifter.LiftLambdas();
             if (errors.HasErrors)
             {
                 Console.WriteLine("Given program contains following errors:");
@@ -51,6 +49,9 @@ namespace MiniPascalCompiler
             }
             else
             {
+                LambdaLifter lifter = new LambdaLifter(program, symbols);
+                lifter.LiftLambdas();
+                symbols = analyzer.Analyze();
                 AssemblyBuilder assembly;
                 CodeGenerator generator = new CodeGenerator(program, symbols);
                 try
