@@ -7,20 +7,21 @@ namespace MiniPascalCompiler
     public abstract class Symbol
     {
         public readonly string Name;
+        public string ScopedName { get { return string.Format("_{0}_{1}", Scope, Name); } }
         public readonly TypeInfo Type;
         public readonly int Scope;
         public bool Predefined { get { return Scope == 0; } }
 
         public Symbol(string name, TypeNode type, int scope)
         {
-            Name = name;
+            Name = name.ToLower();
             Type = new TypeInfo(type);
             Scope = scope;
         }
 
         public Symbol(string name, TypeInfo type, int scope)
         {
-            Name = name;
+            Name = name.ToLower();
             Type = type;
             Scope = scope;
         }
@@ -29,6 +30,7 @@ namespace MiniPascalCompiler
     public abstract class CallableSymbol : Symbol
     {
         public readonly List<ParameterSymbol> Parameters;
+        public readonly List<VariableSymbol> Locals = new List<VariableSymbol>();
         public List<Symbol> FreeVariables = new List<Symbol>();
         public MethodBuilder CILMethod;
 

@@ -54,7 +54,7 @@ namespace MiniPascalCompiler
         public Symbol Lookup(string name)
         {
             List<Symbol> symbolList;
-            if (Symbols.TryGetValue(name, out symbolList))
+            if (Symbols.TryGetValue(name.ToLower(), out symbolList))
             {
                 Symbol predefined = null, best = null;
                 foreach (var symbol in symbolList)
