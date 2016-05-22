@@ -97,7 +97,7 @@ namespace MiniPascalCompiler
         {
             if (CurrentToken.Type != excepted)
             {
-                throw new Exception();
+                throw new Exception(string.Format("Expected {0}, found {1}", excepted, CurrentToken.Type));
             }
             AcceptedToken = CurrentToken;
             NextToken();
@@ -188,21 +188,38 @@ namespace MiniPascalCompiler
             BlockStmt block = new BlockStmt(AcceptedToken);
             while (true)
             {
-                block.Statements.Add(ParseStatement());
-                if (Accept(TokenType.LineTerm))
+                try
                 {
-                    if (Accept(TokenType.KwEnd))
+                    block.Statements.Add(ParseStatement());
+                    if (Accept(TokenType.LineTerm))
                     {
+                        if (Accept(TokenType.KwEnd))
+                        {
+                            break;
+                        }
+                    }
+                    else
+                    {
+                        Match(TokenType.KwEnd);
                         break;
                     }
                 }
-                else
+                catch (Exception e)
                 {
-                    Match(TokenType.KwEnd);
-                    break;
+                    Errors.AddError(e.Message, ErrorType.SyntaxError, CurrentToken.Line, CurrentToken.Column);
+                    SkipToNextStatement();
                 }
             }
             return block;
+        }
+
+        private void SkipToNextStatement()
+        {
+            while (CurrentToken.Type != TokenType.LineTerm && CurrentToken.Type != TokenType.EOF)
+            {
+                NextToken();
+            }
+            NextToken();
         }
 
         private Statement ParseStatement()
@@ -213,7 +230,7 @@ namespace MiniPascalCompiler
                 return parseFunction();
             }
             else
-                throw new Exception();
+                throw new Exception(string.Format("Expected a statement, {0} found", CurrentToken.Type));
         }
 
         private Statement ParseAssertStmt()
@@ -332,7 +349,7 @@ namespace MiniPascalCompiler
                 return node;
             }
             else
-                throw new Exception();
+                throw new Exception(string.Format("Expected a type, {0} found", CurrentToken.Type));
         }
 
         private ExprType ParseTypeName()
@@ -343,7 +360,7 @@ namespace MiniPascalCompiler
                 return parsedType;
             }
             else
-                throw new Exception();
+                throw new Exception(string.Format("Unkown type '{0}'", AcceptedToken.Content));
         }
 
         private Expression ParseExpression()
@@ -430,7 +447,7 @@ namespace MiniPascalCompiler
                 expr.Expr = ParseFactor();
                 factor = expr;
             }
-            else throw new Exception();
+            else throw new Exception(string.Format("Expected a factor, {0} found", CurrentToken.Type));
 
             if (Accept(TokenType.OpDot))
             {
