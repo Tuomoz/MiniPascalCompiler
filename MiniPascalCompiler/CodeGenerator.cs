@@ -375,6 +375,18 @@ namespace MiniPascalCompiler
             il.Emit(OpCodes.Brtrue, bodyLbl);
         }
 
+        private void Visit(AssertStmt assert)
+        {
+            var il = CurrentMethodIL;
+            var trueLbl = il.DefineLabel();
+            Visit((dynamic)assert.AssertExpr);
+            il.Emit(OpCodes.Brtrue, trueLbl);
+            il.EmitWriteLine(string.Format("Assertion failed at line {0}", assert.Line));
+            il.Emit(OpCodes.Ldc_I4_1);
+            il.Emit(OpCodes.Call, typeof(Environment).GetMethod("Exit", new Type[] { typeof(int) }));
+            il.MarkLabel(trueLbl);
+        }
+
         private void Visit(MemberAccessExpr expr)
         {
             Visit((dynamic)expr.AccessedExpr);
@@ -471,6 +483,11 @@ namespace MiniPascalCompiler
                     CurrentMethodIL.Emit(OpCodes.Stloc, localVar.CILLocal);
                 }
             }
+        }
+
+        private void Visit(AstNode node)
+        {
+            throw new Exception("Unimplemented feature " + node.GetType());
         }
     }
 }
