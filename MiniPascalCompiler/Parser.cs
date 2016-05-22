@@ -256,7 +256,7 @@ namespace MiniPascalCompiler
             return assignment;
         }
 
-        private IVariableExpr ParseVariable()
+        private VariableExprBase ParseVariable()
         {
             Token idToken = Match(TokenType.Identifier);
             string id = AcceptedToken.Content;

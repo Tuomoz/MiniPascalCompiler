@@ -1,4 +1,6 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using System.Reflection.Emit;
 
 namespace MiniPascalCompiler
 {
@@ -7,6 +9,7 @@ namespace MiniPascalCompiler
         public readonly string Name;
         public readonly TypeInfo Type;
         public readonly int Scope;
+        public bool Predefined { get { return Scope == 0; } }
 
         public Symbol(string name, TypeNode type, int scope)
         {
@@ -26,6 +29,7 @@ namespace MiniPascalCompiler
     public abstract class CallableSymbol : Symbol
     {
         public readonly List<ParameterSymbol> Parameters;
+        public List<Symbol> FreeVariables = new List<Symbol>();
 
         public CallableSymbol(CallableDeclarationStmt declaration, List<ParameterSymbol> parameters, int scope) :
             base(declaration.Identifier, GetCallableType(declaration), scope)
@@ -54,8 +58,16 @@ namespace MiniPascalCompiler
 
     public class VariableSymbol : Symbol
     {
+        public LocalBuilder CILLocal;
         public VariableSymbol(string name, TypeNode type, int scope) : base(name, type, scope) { }
         public VariableSymbol(string name, TypeInfo type, int scope) : base(name, type, scope) { }
+    }
+
+    public class GlobalSymbol : Symbol
+    {
+        public FieldBuilder CILField;
+        public GlobalSymbol(string name, TypeNode type, int scope) : base(name, type, scope) { }
+        public GlobalSymbol(string name, TypeInfo type, int scope) : base(name, type, scope) { }
     }
 
     public class ProcedureSymbol : CallableSymbol
@@ -100,10 +112,20 @@ namespace MiniPascalCompiler
         public static readonly TypeInfo BasicBool = new TypeInfo(ExprType.Bool);
         public static readonly TypeInfo BasicVoid = new TypeInfo(ExprType.Void);
 
+        public Type CILType
+        {
+            get
+            {
+                Type CILType = GetCILType(BasicType);
+                return IsArray ? CILType.MakeArrayType() : CILType;
+            }
+        }
+
         public TypeInfo(ExprType basicType, bool isArray = false)
         {
             BasicType = basicType;
             IsArray = isArray;
+            int i = 2;
         }
 
         public TypeInfo(TypeNode type)
@@ -125,6 +147,18 @@ namespace MiniPascalCompiler
             }
         }
 
+        public static Type GetCILType(ExprType type)
+        {
+            switch (type)
+            {
+                case ExprType.Bool: return typeof(bool);
+                case ExprType.Int: return typeof(Int32);
+                case ExprType.Real: return typeof(double);
+                case ExprType.String: return typeof(string);
+                default: return null;
+            }
+        }
+
         public bool SameAs(TypeInfo comp)
         {
             return BasicType == comp.BasicType && IsArray == comp.IsArray;
@@ -133,6 +167,16 @@ namespace MiniPascalCompiler
         public bool SameAs(ExprType basicType)
         {
             return !IsArray && BasicType == basicType;
+        }
+
+        public OpCode GetCILConvertOp()
+        {
+            switch (BasicType)
+            {
+                case ExprType.Real: return OpCodes.Conv_R8;
+                default: throw new Exception("No conversion available to " + BasicType);
+            }
+            
         }
 
         public override string ToString()

@@ -88,7 +88,14 @@ namespace MiniPascalCompiler
         public Expression(Token token) : base(token) { }
     }
 
-    public interface IVariableExpr { }
+    public abstract class VariableExprBase : Expression
+    {
+        public Symbol VariableSymbol { get; set; }
+        //public new TypeInfo Type { get { return VariableSymbol.Type; } }
+
+        public VariableExprBase(int line, int column) : base(line, column) { }
+        public VariableExprBase(Token token) : base(token) { }
+    }
 
     public class ProgramNode : AstNode
     {
@@ -164,7 +171,7 @@ namespace MiniPascalCompiler
         public FunctionDeclarationStmt(Token token) : base(token) { }
     }
 
-    public class VariableExpr : Expression, IVariableExpr
+    public class VariableExpr : VariableExprBase
     {
         public string Identifier { get; set; }
 
@@ -180,8 +187,9 @@ namespace MiniPascalCompiler
 
     public class AssignmentStmt : SimpleStmt
     {
-        public IVariableExpr Variable { get; set; }
+        public VariableExprBase Variable { get; set; }
         public Expression AssignmentExpr { get; set; }
+        public Symbol VariableSymbol { get { return Variable.VariableSymbol; } }
 
         public AssignmentStmt(int line, int column) : base(line, column) { }
         public AssignmentStmt(Token token) : base(token) { }
@@ -305,7 +313,7 @@ namespace MiniPascalCompiler
 
     public class RealLiteralExpr : Expression
     {
-        public float Value { get; set; }
+        public double Value { get; set; }
 
         public RealLiteralExpr(int line, int column, float value) : base(line, column)
         {
@@ -314,7 +322,7 @@ namespace MiniPascalCompiler
         }
         public RealLiteralExpr(Token token) : base(token)
         {
-            Value = float.Parse(token.Content, CultureInfo.InvariantCulture);
+            Value = double.Parse(token.Content, CultureInfo.InvariantCulture);
             Type = TypeInfo.BasicReal;
         }
     }
@@ -337,7 +345,7 @@ namespace MiniPascalCompiler
         public MemberAccessExpr(Token token) : base(token) { }
     }
 
-    public class ArrayVariableExpr : Expression, IVariableExpr
+    public class ArrayVariableExpr : VariableExprBase
     {
         public Expression SubscriptExpr { get; set; }
         public string ArrayIdentifier { get; set; }

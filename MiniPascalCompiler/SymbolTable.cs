@@ -99,5 +99,12 @@ namespace MiniPascalCompiler
         {
             return ScopeStack.Pop();
         }
+
+        public void ResetScope()
+        {
+            ScopeStack.Clear();
+            ScopeCounter = 0;
+            ScopeStack.Push(0);
+        }
     }
 }

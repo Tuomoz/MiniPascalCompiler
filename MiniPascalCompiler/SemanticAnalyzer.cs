@@ -12,7 +12,8 @@ namespace MiniPascalCompiler
         private ErrorHandler Errors;
         private SymbolTable Symbols = new SymbolTable();
         private Stack<TypeInfo> TypeStack = new Stack<TypeInfo>();
-        private Stack<TypeInfo> ReturnTypeStack = new Stack<TypeInfo>();
+        //private Stack<TypeInfo> ReturnTypeStack = new Stack<TypeInfo>();
+        private Stack<CallableSymbol> FunctionStack = new Stack<CallableSymbol>();
         private TypeChecker TypeChecker;
 
         public SemanticAnalyzer(ProgramNode program, ErrorHandler errors)
@@ -20,7 +21,7 @@ namespace MiniPascalCompiler
             Program = program;
             Errors = errors;
             TypeChecker = new TypeChecker();
-            ReturnTypeStack.Push(TypeInfo.BasicVoid);
+            //ReturnTypeStack.Push(TypeInfo.BasicVoid);
         }
 
         public SymbolTable Analyze()
@@ -33,8 +34,9 @@ namespace MiniPascalCompiler
         {
             if (!Symbols.ExistsInCurrentScope(declarationStmt.Identifier))
             {
+                int currentScope = Symbols.CurrentScope;
                 int procedureScope = Symbols.EnterScope();
-                ReturnTypeStack.Push(TypeInfo.BasicVoid);
+                //ReturnTypeStack.Push(TypeInfo.BasicVoid);
                 var parameterSymbols = new List<ParameterSymbol>();
                 foreach (var parameter in declarationStmt.Parameters)
                 {
@@ -42,10 +44,14 @@ namespace MiniPascalCompiler
                     Symbols.AddSymbol(parameterSymbol);
                     parameterSymbols.Add(parameterSymbol);
                 }
+                var procSymbol = new ProcedureSymbol(declarationStmt, parameterSymbols, currentScope);
+                Symbols.AddSymbol(procSymbol);
+                FunctionStack.Push(procSymbol);
                 Visit(declarationStmt.ProcedureBlock);
                 Symbols.LeaveScope();
-                ReturnTypeStack.Pop();
-                Symbols.AddSymbol(new ProcedureSymbol(declarationStmt, parameterSymbols, Symbols.CurrentScope));
+                //ReturnTypeStack.Pop();
+                FunctionStack.Pop();
+                
             }
             else
             {
@@ -71,8 +77,24 @@ namespace MiniPascalCompiler
 
         private void CheckCallParameters(AstNode callNode, List<Expression> arguments, CallableSymbol callable)
         {
+            int index = 0;
             if (callable.Parameters.Count != 0 && callable.Parameters[0].Varargs)
             {
+                bool referenceParams = callable.Parameters[0].IsReference;
+                foreach (Expression argument in arguments)
+                {
+                    Visit((dynamic)argument);
+                    TypeInfo argumentType = TypeStack.Pop();
+                    if (IsNotVoid(argumentType))
+                    {
+                        if (!(argument is VariableExpr) && !(argument is ArrayVariableExpr) && referenceParams)
+                        {
+                            AddError(string.Format("'{0}' argument {1} expects a variable of type {2}",
+                                callable.Name, index + 1, argumentType), callNode);
+                        }
+                    }
+                    index++;
+                }
                 return;
             }
 
@@ -82,7 +104,6 @@ namespace MiniPascalCompiler
                     callable.Name, callable.Parameters.Count, arguments.Count), callNode);
                 return;
             }
-            int index = 0;
             foreach (Expression argument in arguments)
             {
                 Visit((dynamic)argument);
@@ -107,7 +128,8 @@ namespace MiniPascalCompiler
 
         private void Visit(ReturnStmt returnStmt)
         {
-            var expectedType = ReturnTypeStack.Peek();
+            //var expectedType = ReturnTypeStack.Peek();
+            var expectedType = FunctionStack.Peek().Type;
             if (returnStmt.ReturnExpression != null && expectedType.BasicType == ExprType.Void)
             {
                 AddError("Can't return a value in a procedure", returnStmt);
@@ -187,6 +209,7 @@ namespace MiniPascalCompiler
             Symbol symbol = Symbols.Lookup(arrayVariableExpr.ArrayIdentifier);
             if (symbol != null)
             {
+                arrayVariableExpr.VariableSymbol = symbol;
                 Visit((dynamic)arrayVariableExpr.SubscriptExpr);
                 TypeInfo subscriptType = TypeStack.Pop();
                 if (!symbol.Type.IsArray)
@@ -247,17 +270,22 @@ namespace MiniPascalCompiler
             TypeStack.Push(TypeInfo.BasicInt);
         }
 
-        private void Visit(VariableExpr identifierExpr)
+        private void Visit(VariableExpr variableExpr)
         {
-            Symbol symbol = Symbols.Lookup(identifierExpr.Identifier);
+            Symbol symbol = Symbols.Lookup(variableExpr.Identifier);
             if (symbol != null)
             {
+                variableExpr.VariableSymbol = symbol;
+                if (symbol.Scope != Symbols.CurrentScope)
+                {
+                    FunctionStack.Peek().FreeVariables.Add(symbol);
+                }
                 TypeStack.Push(symbol.Type);
-                identifierExpr.Type = symbol.Type;
+                variableExpr.Type = symbol.Type;
             }
             else
             {
-                AddError(string.Format("Undeclared variable '{0}'", identifierExpr.Identifier), identifierExpr);
+                AddError(string.Format("Undeclared variable '{0}'", variableExpr.Identifier), variableExpr);
                 TypeStack.Push(TypeInfo.BasicVoid);
             }
         }
@@ -313,8 +341,9 @@ namespace MiniPascalCompiler
         {
             if (!Symbols.ExistsInCurrentScope(declarationStmt.Identifier))
             {
+                int currentScope = Symbols.CurrentScope;
                 int procedureScope = Symbols.EnterScope();
-                ReturnTypeStack.Push(new TypeInfo(declarationStmt.ReturnType));
+                //ReturnTypeStack.Push(new TypeInfo(declarationStmt.ReturnType));
                 var parameterSymbols = new List<ParameterSymbol>();
                 foreach (var parameter in declarationStmt.Parameters)
                 {
@@ -322,10 +351,13 @@ namespace MiniPascalCompiler
                     Symbols.AddSymbol(parameterSymbol);
                     parameterSymbols.Add(parameterSymbol);
                 }
+                var funcSymbol = new FunctionSymbol(declarationStmt, parameterSymbols, currentScope);
+                Symbols.AddSymbol(funcSymbol);
+                FunctionStack.Push(funcSymbol);
                 Visit(declarationStmt.ProcedureBlock);
                 Symbols.LeaveScope();
-                ReturnTypeStack.Pop();
-                Symbols.AddSymbol(new FunctionSymbol(declarationStmt, parameterSymbols, Symbols.CurrentScope));
+                //ReturnTypeStack.Pop();
+                FunctionStack.Pop();
             }
             else
             {
@@ -337,7 +369,16 @@ namespace MiniPascalCompiler
         {
             foreach (string identifier in varDeclarationStmt.Identifiers)
             {
-                if (!Symbols.AddSymbol(new VariableSymbol(identifier, varDeclarationStmt.Type, Symbols.CurrentScope)))
+                bool created;
+                if (Symbols.CurrentScope == 1)
+                {
+                    created = Symbols.AddSymbol(new GlobalSymbol(identifier, varDeclarationStmt.Type, Symbols.CurrentScope));
+                }
+                else
+                {
+                    created = Symbols.AddSymbol(new VariableSymbol(identifier, varDeclarationStmt.Type, Symbols.CurrentScope));
+                }
+                if (!created)
                 {
                     AddError(string.Format("'{0}' is already declared in current scope", identifier), varDeclarationStmt);
                 }
@@ -347,6 +388,7 @@ namespace MiniPascalCompiler
 
         private void Visit(ProgramNode programNode)
         {
+            FunctionStack.Push(new ProcedureSymbol("_Main", false, false, 1));
             Visit(programNode.Block);
         }
 
